@@ -7,8 +7,11 @@ using namespace std;
 int main()
 {
     auto start = clock();
+    LargeInteger base(2);
+    LargeInteger expo(2048);
+    LargeInteger mod(1747);
     // cout << two_pow(2048) << endl;
-    cout << LargeInteger("76231376437686732423") % 12433642376 << endl;
+    cout << pow(base, expo, mod) << endl;
     auto end = clock();
 
     double time = double(end - start) / CLOCKS_PER_SEC;

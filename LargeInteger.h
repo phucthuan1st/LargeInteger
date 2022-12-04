@@ -88,3 +88,6 @@ public:
     friend LargeInteger operator/(unsigned long long dividend, LargeInteger divisor);
     friend LargeInteger operator%(unsigned long long dividend, LargeInteger divisor);
 };
+
+LargeInteger pow(LargeInteger base, LargeInteger expo);
+LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod);

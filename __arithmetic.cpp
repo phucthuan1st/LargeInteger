@@ -305,3 +305,29 @@ LargeInteger operator%(unsigned long long first, LargeInteger second)
 {
     return LargeInteger(first) % second;
 }
+
+LargeInteger pow(LargeInteger base, LargeInteger expo)
+{
+    LargeInteger result(1);
+
+    while (expo > 0)
+    {
+        result = result * base;
+        expo = expo - 1;
+    }
+
+    return result;
+}
+
+LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
+{
+    LargeInteger result(1);
+
+    while (expo > 0)
+    {
+        result = result * base % mod;
+        expo = expo - 1;
+    }
+
+    return result;
+}
