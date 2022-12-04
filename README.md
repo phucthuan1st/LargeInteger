@@ -37,7 +37,7 @@ Với ngôn ngữ C++, thông qua lớp LargeInteger, ta có:
   - $a \ge b \Leftrightarrow \neg(a < b)$
   - $a \le b \Leftrightarrow \neg(a > b)$
 
-### Phép so sánh bằng và so sánh khác:
+### Phép so sánh bằng và so sánh khác =, !=:
 
 - 2 số bằng nhau nếu tất cả chữ số giống nhau
 - Ngược lại thì khác nhau
@@ -79,3 +79,6 @@ Khi đó $a \cdot b = \sum\limits_{i = 0, j = 0}^{n,m} a_i \cdot b_j * 10^{i + j
 ### Phép modulo chia lấy dư (%):
 
 Với việc thực hiện chia như trên, phần còn lại cuối cùng của $SubDividend$ sau khi thực hiện chia chính là phần dư.
+
+## Người thực hiện:
+Nguyễn Phúc Thuần - khoa Công nghệ thông tin, trường Đại học Khoa học Tự nhiên, ĐHQG-HCM
