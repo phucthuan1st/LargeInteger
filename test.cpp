@@ -4,20 +4,6 @@
 
 using namespace std;
 
-LargeInteger two_pow(int expo)
-{
-
-    LargeInteger result(1);
-    LargeInteger base(2);
-
-    for (int i = 0; i < expo; i++)
-    {
-        result = result * base;
-    }
-
-    return result;
-}
-
 int main()
 {
     auto start = clock();
