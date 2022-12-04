@@ -10,7 +10,7 @@ Trong ngôn ngữ C++, kiểu dữ liệu unsigned long long là kiểu dữ li�
 
 Để giải quyết vấn đề trên, tôi cung cắp một cách tiếp cận trên ngôn ngữ C++ với việc lưu mỗi chữ số trên 1 ô nhớ 1 byte (tức mỗi chữ số là 1 kí tự kiểu char).
 
-## Cài đặt:
+## Ý tưởng cài đặt:
 
 Với ngôn ngữ C++, thông qua lớp LargeInteger, ta có:
 
