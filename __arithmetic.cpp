@@ -1,12 +1,5 @@
 #include "LargeInteger.h"
 
-//------------------ MARK ---------------------//
-LargeInteger &LargeInteger::operator=(LargeInteger other)
-{
-    this->digits = other.digits;
-    return *this;
-}
-
 LargeInteger operator+(LargeInteger first, LargeInteger second)
 {
     LargeInteger result;
@@ -148,14 +141,6 @@ LargeInteger operator*(LargeInteger first, LargeInteger second)
     result.cleanup();
 
     return result;
-}
-
-LargeInteger LargeInteger::multiply_pow_10(unsigned long long n)
-{
-    for (unsigned int i = 0; i < n; i++)
-    {
-        this->digits.insert(this->digits.begin(), '0');
-    }
 }
 
 LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
@@ -319,23 +304,4 @@ LargeInteger operator/(unsigned long long first, LargeInteger second)
 LargeInteger operator%(unsigned long long first, LargeInteger second)
 {
     return LargeInteger(first) % second;
-}
-
-ostream &operator<<(ostream &out, LargeInteger big_int)
-{
-    string digits = big_int.to_str();
-
-    out << digits;
-
-    return out;
-}
-
-istream &operator>>(istream &in, LargeInteger big_int)
-{
-    string digits;
-    in >> digits;
-
-    big_int.parse(digits);
-
-    return in;
 }

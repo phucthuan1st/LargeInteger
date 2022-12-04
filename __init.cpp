@@ -59,37 +59,8 @@ LargeInteger::LargeInteger(const LargeInteger &other)
     this->digits = vector<char>(other.digits);
 }
 
-void LargeInteger::cleanup()
+LargeInteger &LargeInteger::operator=(LargeInteger other)
 {
-    while (this->digits[this->digits.size() - 1] == '0' && this->digitNum() > 1)
-    {
-        this->digits.pop_back();
-    }
-}
-
-void LargeInteger::parse(string &digits)
-{
-    this->digits = {};
-    for (auto &digit : digits)
-    {
-        this->digits.push_back(digit);
-    }
-
-    reverse(this->digits.begin(), this->digits.end());
-}
-
-string LargeInteger::to_str()
-{
-    string digits;
-
-    vector<char> int_digits = this->digits;
-
-    for (auto &digit : this->digits)
-    {
-        digits += digit;
-    }
-
-    reverse(digits.begin(), digits.end());
-
-    return digits;
+    this->digits = other.digits;
+    return *this;
 }

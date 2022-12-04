@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 
+// order of '0'
 #define ZERO 48
 
 using namespace std;
@@ -13,7 +14,6 @@ class LargeInteger
 {
 private:
     vector<char> digits;
-
     void cleanup();
 
 public:
@@ -22,18 +22,30 @@ public:
     LargeInteger(const LargeInteger &other);
     LargeInteger(string &);
     LargeInteger(string);
+    LargeInteger &operator=(LargeInteger other);
 
+    //---------------------- UTILITIES ----------------------//
+    // parse a string to large integer
     void parse(string &);
+
+    // get string representation of your large integer
     string to_str();
 
+    // get number of digit of your number
     int digitNum() { return this->digits.size(); }
 
+    // check if your number is NULL
     bool isNull() { return this->digits.size() == 0; }
 
+    // multiply your number by 10^n
     LargeInteger multiply_pow_10(unsigned long long n);
 
-    friend istream &operator>>(istream &, LargeInteger);
+    //---------------------- INPUT & OUTPUT ----------------------//
+
+    friend istream &operator>>(istream &, LargeInteger &);
     friend ostream &operator<<(ostream &, LargeInteger);
+
+    //---------------------- COMPARISION ----------------------//
 
     friend bool operator<(LargeInteger first, LargeInteger second);
     friend bool operator>(LargeInteger first, LargeInteger second);
@@ -56,7 +68,7 @@ public:
     friend bool operator==(unsigned long long first, LargeInteger second);
     friend bool operator!=(unsigned long long first, LargeInteger second);
 
-    LargeInteger &operator=(LargeInteger second);
+    //---------------------- ARITHMETIC ----------------------//
 
     friend LargeInteger operator+(LargeInteger first, LargeInteger second);
     friend LargeInteger operator-(LargeInteger first, LargeInteger second);
