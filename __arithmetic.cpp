@@ -319,14 +319,21 @@ LargeInteger pow(LargeInteger base, LargeInteger expo)
     return result;
 }
 
+// calculate base^expo % mod
 LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
 {
     LargeInteger result(1);
+    base = base % mod;
 
     while (expo > 0)
     {
-        result = result * base % mod;
-        expo = expo - 1;
+        if (!expo.isEven())
+        {
+            result = (result * base) % mod;
+        }
+
+        expo = expo / 2;
+        base = base * base % mod;
     }
 
     return result;

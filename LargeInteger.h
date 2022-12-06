@@ -37,6 +37,9 @@ public:
     // check if your number is NULL
     bool isNull() { return this->digits.size() == 0; }
 
+    // is Even
+    bool isEven() { return ((this->digits[this->digitNum() - 1] - ZERO) % 2 == 0); }
+
     // multiply your number by 10^n
     LargeInteger multiply_pow_10(unsigned long long n);
 
