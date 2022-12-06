@@ -38,6 +38,7 @@ bool operator>(LargeInteger first, LargeInteger second)
 
     while (n--)
     {
+
         if (first.digits[n] < second.digits[n])
         {
             return false;

@@ -1,4 +1,5 @@
 #pragma once
+#define LARGE_INT
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -7,6 +8,8 @@
 
 // order of '0'
 #define ZERO 48
+
+#define LONG_LONG_MAX LargeInteger("18446744073709551615")
 
 using namespace std;
 
@@ -38,7 +41,11 @@ public:
     bool isNull() { return this->digits.size() == 0; }
 
     // is Even
-    bool isEven() { return ((this->digits[this->digitNum() - 1] - ZERO) % 2 == 0); }
+    bool isEven()
+    {
+        char lastDigit = this->digits.at(0);
+        return lastDigit % 2 == 0;
+    }
 
     // multiply your number by 10^n
     LargeInteger multiply_pow_10(unsigned long long n);

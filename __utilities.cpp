@@ -2,7 +2,7 @@
 
 void LargeInteger::cleanup()
 {
-    while (this->digits[this->digits.size() - 1] == '0' && this->digitNum() > 1)
+    while (this->digitNum() > 1 && this->digits[this->digits.size() - 1] == '0')
     {
         this->digits.pop_back();
     }

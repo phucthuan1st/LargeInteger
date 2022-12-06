@@ -169,10 +169,10 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
     // temporary/sub dividend
     LargeInteger dv;
 
-    while (digit_pos > 0)
+    while (digit_pos >= 0)
     {
         // get as much as posible digit for sub-dividsend
-        while (dv.isNull() || dv < divisor)
+        while (digit_pos >= 0 && (dv.isNull() || dv < divisor))
         {
             dv.digits.insert(dv.digits.begin(), dividend.digits[digit_pos--]);
 
@@ -180,6 +180,13 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
             {
                 result.digits.insert(result.digits.begin(), '0');
             }
+        }
+
+        dv.cleanup();
+        if (dv < divisor)
+        {
+            result.cleanup();
+            return result;
         }
 
         // multiplying and subtracting
@@ -193,11 +200,17 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
         }
 
         quotient = quotient - one;
-        dv = dv - quotient * divisor;
+        save = quotient * divisor;
+        dv = dv - save;
 
         for (auto &digit : quotient.digits)
         {
             result.digits.insert(result.digits.begin(), digit);
+        }
+
+        if (dv == 0)
+        {
+            dv.digits = {};
         }
     }
 
@@ -230,13 +243,22 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
 
     // temporary/sub dividend
     LargeInteger dv;
+    string dv_str = "";
+    string save_str = "";
 
-    while (digit_pos > 0)
+    while (digit_pos >= 0)
     {
         // get as much as posible digit for sub-dividsend
-        while (dv.isNull() || dv < divisor)
+        while (digit_pos >= 0 && (dv.isNull() || dv < divisor))
         {
             dv.digits.insert(dv.digits.begin(), dividend.digits[digit_pos--]);
+            dv_str = dv.to_str();
+        }
+        dv.cleanup();
+
+        if (dv < divisor)
+        {
+            return dv;
         }
 
         // multiplying and subtracting
@@ -250,7 +272,8 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
         }
 
         quotient = quotient - one;
-        dv = dv - quotient * divisor;
+        save = quotient * divisor;
+        dv = dv - save;
     }
 
     return dv;
@@ -322,18 +345,23 @@ LargeInteger pow(LargeInteger base, LargeInteger expo)
 // calculate base^expo % mod
 LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
 {
+    LargeInteger zero(0);
     LargeInteger result(1);
-    base = base % mod;
 
-    while (expo > 0)
+    if (expo.isEven() == false)
     {
-        if (!expo.isEven())
+        result = base % mod;
+    }
+
+    while (expo != zero)
+    {
+        expo = expo / 2;
+        base = (base * base) % mod;
+
+        if (expo.isEven() == false)
         {
             result = (result * base) % mod;
         }
-
-        expo = expo / 2;
-        base = base * base % mod;
     }
 
     return result;
