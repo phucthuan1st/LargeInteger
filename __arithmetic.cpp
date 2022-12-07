@@ -243,16 +243,17 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
 
     // temporary/sub dividend
     LargeInteger dv;
-    string dv_str = "";
-    string save_str = "";
 
     while (digit_pos >= 0)
     {
         // get as much as posible digit for sub-dividsend
+        if (dv == 0)
+        {
+            dv.digits = {};
+        }
         while (digit_pos >= 0 && (dv.isNull() || dv < divisor))
         {
             dv.digits.insert(dv.digits.begin(), dividend.digits[digit_pos--]);
-            dv_str = dv.to_str();
         }
         dv.cleanup();
 
