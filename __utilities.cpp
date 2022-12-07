@@ -10,10 +10,18 @@ void LargeInteger::cleanup()
 
 void LargeInteger::parse(string &digits)
 {
-    this->digits = {};
+    if (digits.at(0) == '-')
+    {
+        this->digits.push_back(digits.at(0));
+        digits.erase(digits.begin());
+    }
+
     for (auto &digit : digits)
     {
-        this->digits.push_back(digit);
+        if ((digit <= '0' && digit <= '9'))
+            this->digits.push_back(digit);
+        else
+            throw("Invalid input");
     }
 
     reverse(this->digits.begin(), this->digits.end());
@@ -43,6 +51,28 @@ LargeInteger LargeInteger::multiply_pow_10(unsigned long long n)
     }
 
     return *this;
+}
+
+LargeInteger LargeInteger::abs()
+{
+    LargeInteger result = *this;
+    if (result.isNegative())
+    {
+        result.digits.pop_back();
+    }
+
+    return result;
+}
+
+LargeInteger LargeInteger::negative()
+{
+    LargeInteger result = *this;
+    if (!result.isNegative())
+    {
+        result.digits.push_back('-');
+    }
+
+    return result;
 }
 
 // fast gcd using Stein's algorithm

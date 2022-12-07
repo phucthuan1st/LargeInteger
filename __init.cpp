@@ -5,7 +5,7 @@ LargeInteger::LargeInteger()
     this->digits = {};
 }
 
-LargeInteger::LargeInteger(unsigned long long value)
+LargeInteger::LargeInteger(long long value)
 {
     if (value == 0)
     {
@@ -36,19 +36,18 @@ LargeInteger::LargeInteger(unsigned long long value)
 
 LargeInteger::LargeInteger(string digits)
 {
-    for (auto &digit : digits)
+    if (digits.at(0) == '-')
     {
-        this->digits.push_back(digit);
+        this->digits.push_back(digits.at(0));
+        digits.erase(digits.begin());
     }
 
-    reverse(this->digits.begin(), this->digits.end());
-}
-
-LargeInteger::LargeInteger(string &digits)
-{
     for (auto &digit : digits)
     {
-        this->digits.push_back(digit);
+        if ((digit <= '0' && digit <= '9'))
+            this->digits.push_back(digit);
+        else
+            throw("Invalid input");
     }
 
     reverse(this->digits.begin(), this->digits.end());

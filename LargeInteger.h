@@ -21,9 +21,8 @@ private:
 
 public:
     LargeInteger();
-    LargeInteger(unsigned long long);
+    LargeInteger(long long);
     LargeInteger(const LargeInteger &other);
-    LargeInteger(string &);
     LargeInteger(string);
     LargeInteger &operator=(LargeInteger other);
 
@@ -41,14 +40,19 @@ public:
     bool isNull() { return this->digits.size() == 0; }
 
     // is Even
-    bool isEven()
-    {
-        char lastDigit = this->digits.at(0);
-        return (lastDigit - ZERO) % 2 == 0;
-    }
+    bool isEven() { return (this->digits.at(0) - ZERO) % 2 == 0; }
+
+    // is Negative
+    bool isNegative() { return (this->digits.at(this->digits.size() - 1)) == '-'; }
 
     // multiply your number by 10^n
     LargeInteger multiply_pow_10(unsigned long long n);
+
+    // get abs of the number
+    LargeInteger abs();
+
+    // get negative form of the number
+    LargeInteger negative();
 
     //---------------------- INPUT & OUTPUT ----------------------//
 

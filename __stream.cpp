@@ -9,7 +9,7 @@ ostream &operator<<(ostream &out, LargeInteger big_int)
     return out;
 }
 
-istream &operator>>(istream &in, LargeInteger &&big_int)
+istream &operator>>(istream &in, LargeInteger &big_int)
 {
     string digits;
     in >> digits;

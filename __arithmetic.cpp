@@ -2,7 +2,38 @@
 
 LargeInteger operator+(LargeInteger first, LargeInteger second)
 {
+    if (first.isNull() || second.isNull())
+        return LargeInteger();
+
+    if (first == 0)
+    {
+        return second;
+    }
+
+    if (second == 0)
+    {
+        return first;
+    }
+
     LargeInteger result;
+
+    if (first.isNegative() && second.isNegative())
+    {
+        result = first.abs() + second.abs();
+        result = result.negative();
+        return result;
+    }
+
+    if (first.isNegative())
+    {
+        return second - first;
+    }
+
+    if (second.isNegative())
+    {
+        return first - second;
+    }
+
     int n = second.digitNum();
     int m = first.digitNum();
 
@@ -39,11 +70,50 @@ LargeInteger operator+(LargeInteger first, LargeInteger second)
 
 LargeInteger operator-(LargeInteger first, LargeInteger second)
 {
-    if (first < second)
+    if (first.isNull() || second.isNull())
+        return LargeInteger();
+
+    if (first == 0)
     {
-        throw("Under Zero Subtraction");
+        return second;
     }
+
+    if (second == 0)
+    {
+        return first;
+    }
+
     LargeInteger result;
+    LargeInteger first_abs = first.abs();
+    LargeInteger second_abs = second.abs();
+
+    if (first.isNegative() && second.isNegative())
+    {
+        if (first_abs > second_abs)
+        {
+            result = first_abs - second_abs;
+            result = result.negative();
+        }
+        else
+        {
+            result = second_abs - first_abs;
+        }
+
+        return result;
+    }
+
+    if (first.isNegative())
+    {
+        result = first_abs + second;
+        result = result.negative();
+        return result;
+    }
+
+    if (second.isNegative())
+    {
+        return first + second_abs;
+    }
+
     int n = second.digitNum();
     int m = first.digitNum();
 
@@ -95,9 +165,39 @@ LargeInteger operator-(LargeInteger first, LargeInteger second)
 
 LargeInteger operator*(LargeInteger first, LargeInteger second)
 {
-
     if (first.isNull() || second.isNull())
         return LargeInteger();
+    if (first == 0 || second == 0)
+    {
+        return LargeInteger(0);
+    }
+
+    if (first == 1)
+    {
+        return second;
+    }
+
+    if (second == 1)
+    {
+        return first;
+    }
+
+    if (first.isNegative() && second.isNegative())
+    {
+        return first.abs() * second.abs();
+    }
+
+    if (first.isNegative())
+    {
+        LargeInteger result = first.abs() * second;
+        return result.negative();
+    }
+
+    if (second.isNegative())
+    {
+        LargeInteger result = first * second.abs();
+        return result.negative();
+    }
 
     int f = first.digitNum();
     int s = second.digitNum();
@@ -163,6 +263,23 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
         return one;
     }
 
+    if (dividend.isNegative() && divisor.isNegative())
+    {
+        return dividend.abs() / divisor.abs();
+    }
+
+    if (dividend.isNegative())
+    {
+        LargeInteger result = dividend.abs() / divisor;
+        return result.negative();
+    }
+
+    if (divisor.isNegative())
+    {
+        LargeInteger result = dividend / divisor.abs();
+        return result.negative();
+    }
+
     int digit_pos = dividend.digitNum() - 1;
     LargeInteger result;
 
@@ -220,6 +337,18 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
 
 LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
 {
+    if (divisor.isNegative())
+    {
+        return dividend % divisor.abs();
+    }
+
+    if (dividend.isNegative())
+    {
+        LargeInteger result = dividend.abs() % divisor;
+        result = divisor - result;
+        return result;
+    }
+
     LargeInteger zero(0);
     LargeInteger one(1);
 

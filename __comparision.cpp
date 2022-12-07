@@ -5,6 +5,18 @@ bool operator<(LargeInteger first, LargeInteger second)
     first.cleanup();
     second.cleanup();
 
+    // handle negative case
+    if (first.isNegative() && second.isNegative())
+    {
+        return first.abs() > second.abs();
+    }
+
+    if (first.isNegative())
+        return true;
+
+    if (second.isNegative())
+        return false;
+
     int n = first.digitNum();
     int m = second.digitNum();
 
@@ -33,6 +45,18 @@ bool operator>(LargeInteger first, LargeInteger second)
 {
     first.cleanup();
     second.cleanup();
+
+    // handle negative case
+    if (first.isNegative() && second.isNegative())
+    {
+        return first.abs() < second.abs();
+    }
+
+    if (first.isNegative())
+        return false;
+
+    if (second.isNegative())
+        return true;
 
     int n = first.digitNum();
     int m = second.digitNum();
