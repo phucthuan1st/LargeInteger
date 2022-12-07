@@ -97,6 +97,7 @@ bool checkPrimeMillerRabin(LargeInteger n, LargeInteger k)
 int main()
 {
 	LargeInteger n(11027), k(1000);
+	LargeInteger test(8168);
 
 	auto start = clock();
 	if (checkPrimeFermat(n, k) == true)
