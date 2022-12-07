@@ -20,7 +20,6 @@ private:
 public:
     LargeInteger next()
     {
-        cout << "Current seed: " << seed << endl;
         LargeInteger temp = this->seed;
         this->seed = (this->seed + B) % LONG_LONG_MAX * A;
         return temp;
