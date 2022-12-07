@@ -1,5 +1,4 @@
 #pragma once
-#define LARGE_INT
 #include <iostream>
 #include <fstream>
 #include <vector>

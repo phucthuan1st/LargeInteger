@@ -18,7 +18,7 @@ void LargeInteger::parse(string &digits)
 
     for (auto &digit : digits)
     {
-        if ((digit <= '0' && digit <= '9'))
+        if ((digit >= '0' && digit <= '9'))
             this->digits.push_back(digit);
         else
             throw("Invalid input");

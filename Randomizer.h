@@ -1,9 +1,6 @@
 #pragma once
-#include <ctime>
-
-#ifndef LARGE_INT
 #include "LargeInteger.h"
-#endif
+#include <ctime>
 
 #define A LargeInteger(816744073709551516)
 #define B LargeInteger(515161867449551561)
@@ -23,8 +20,9 @@ private:
 public:
     LargeInteger next()
     {
+        cout << "Current seed: " << seed << endl;
         LargeInteger temp = this->seed;
-        this->seed = (this->seed + B) % LargeInteger(LONG_LONG_MAX) * A;
+        this->seed = (this->seed + B) % LONG_LONG_MAX * A;
         return temp;
     }
 
@@ -48,5 +46,3 @@ public:
         return instance;
     }
 };
-
-Randomizer *Randomizer::instance = NULL;
