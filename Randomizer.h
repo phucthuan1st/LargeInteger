@@ -9,7 +9,8 @@ private:
 
     Randomizer()
     {
-        seed = (LargeInteger(time(NULL)) * constant::A + constant::B) % constant::LONG_LONG_MAX;
+        seed = LargeInteger(time(0) + clock());
+        seed = constant::half_max_LargeInt + ((seed * constant::A + constant::B) % constant::diff);
     }
 
     static Randomizer *instance;
@@ -18,7 +19,7 @@ public:
     LargeInteger next()
     {
         LargeInteger temp = this->seed;
-        this->seed = (this->seed * constant::multipliment + constant::increment) % constant::LONG_LONG_MAX;
+        this->seed = constant::half_max_LargeInt + ((seed * constant::A) + constant::B) % constant::diff;
         return temp;
     }
 
