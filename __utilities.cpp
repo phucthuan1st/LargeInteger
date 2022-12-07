@@ -44,3 +44,66 @@ LargeInteger LargeInteger::multiply_pow_10(unsigned long long n)
 
     return *this;
 }
+
+// fast gcd using Stein's algorithm
+LargeInteger gcd(LargeInteger a, LargeInteger b)
+{
+    // MARK: Special cases:
+    // if the two are null, just null result
+    if (a.isNull() || b.isNull())
+        return LargeInteger();
+
+    if (a == 0)
+        return b;
+
+    if (b == 0)
+        return a;
+    // MARK: End Special cases!
+
+    // make sure a >=b in all cases
+    if (b > a)
+        return gcd(b, a);
+
+    LargeInteger zero(0);
+    LargeInteger two(2);
+    LargeInteger g(1);
+
+    LargeInteger t;
+
+    while (a.isEven() && b.isEven())
+    {
+        a = a / two;
+        b = b / two;
+        g = g * two;
+    }
+
+    while (a > 0)
+    {
+
+        while (a.isEven())
+        {
+            a = a / two;
+        }
+
+        while (b.isEven())
+        {
+            b = b / two;
+        }
+
+        LargeInteger sub = (a > b) ? (a - b) : (b - a);
+        t = sub / two;
+
+        if (a >= b)
+        {
+            a = t;
+        }
+        else
+        {
+            b = t;
+        }
+    }
+
+    g = g * b;
+
+    return g;
+}

@@ -5,15 +5,15 @@
 
 using namespace std;
 
-LargeInteger gcd(LargeInteger a, LargeInteger b)
-{
-	if (b == 0)
-	{
-		return a;
-	}
+// LargeInteger gcd(LargeInteger a, LargeInteger b)
+// {
+// 	if (b == 0)
+// 	{
+// 		return a;
+// 	}
 
-	return gcd(b, a % b);
-}
+// 	return gcd(b, a % b);
+// }
 
 // using little Fermat to check if n is Prime number method with k tries
 bool checkPrimeFermat(LargeInteger n, LargeInteger k)
@@ -100,16 +100,17 @@ int main()
 	LargeInteger test(8168);
 
 	auto start = clock();
-	if (checkPrimeFermat(n, k) == true)
-	{
-		cout << n << " is a Prime number." << endl;
-	}
-	else
-	{
-		cout << n << " is not a Prime number." << endl;
-	}
-	auto end = clock();
-	double time = double(end - start) / CLOCKS_PER_SEC;
+	cout << gcd(n, test) << endl;
+	// if (checkPrimeFermat(n, k) == true)
+	// {
+	// 	cout << n << " is a Prime number." << endl;
+	// }
+	// else
+	// {
+	// 	cout << n << " is not a Prime number." << endl;
+	// }
+	// auto end = clock();
+	// double time = double(end - start) / CLOCKS_PER_SEC;
 	cout << "Fermat running time: " << time << endl;
 
 	// if (checkPrimeMillerRabin(n, k) == true)

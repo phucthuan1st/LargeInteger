@@ -44,7 +44,7 @@ public:
     bool isEven()
     {
         char lastDigit = this->digits.at(0);
-        return lastDigit % 2 == 0;
+        return (lastDigit - ZERO) % 2 == 0;
     }
 
     // multiply your number by 10^n
@@ -101,3 +101,4 @@ public:
 
 LargeInteger pow(LargeInteger base, LargeInteger expo);
 LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod);
+LargeInteger gcd(LargeInteger a, LargeInteger b);

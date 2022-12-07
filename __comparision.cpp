@@ -2,6 +2,9 @@
 
 bool operator<(LargeInteger first, LargeInteger second)
 {
+    first.cleanup();
+    second.cleanup();
+
     int n = first.digitNum();
     int m = second.digitNum();
 
@@ -28,6 +31,9 @@ bool operator<(LargeInteger first, LargeInteger second)
 
 bool operator>(LargeInteger first, LargeInteger second)
 {
+    first.cleanup();
+    second.cleanup();
+
     int n = first.digitNum();
     int m = second.digitNum();
 

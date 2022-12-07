@@ -215,7 +215,6 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
     }
 
     result.cleanup();
-
     return result;
 }
 
