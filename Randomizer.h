@@ -2,9 +2,6 @@
 #include "LargeInteger.h"
 #include <ctime>
 
-#define A LargeInteger(816744073709551516)
-#define B LargeInteger(515161867449551561)
-
 class Randomizer
 {
 private:
@@ -12,7 +9,7 @@ private:
 
     Randomizer()
     {
-        seed = (LargeInteger(time(NULL)) + B) * A;
+        seed = (LargeInteger(time(NULL)) * constant::A + constant::B) % constant::LONG_LONG_MAX;
     }
 
     static Randomizer *instance;
@@ -21,13 +18,13 @@ public:
     LargeInteger next()
     {
         LargeInteger temp = this->seed;
-        this->seed = (this->seed + B) % LONG_LONG_MAX * A;
+        this->seed = (this->seed * constant::multipliment + constant::increment) % constant::LONG_LONG_MAX;
         return temp;
     }
 
     LargeInteger next(LargeInteger min, LargeInteger max)
     {
-        return min + next() % (max - min + LargeInteger(1));
+        return min + next() % (max - min + 1);
     }
 
     LargeInteger next(unsigned long long min, unsigned long long max)
