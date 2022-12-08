@@ -163,6 +163,7 @@ LargeInteger operator-(LargeInteger first, LargeInteger second)
     return result;
 }
 
+// slow multiplying
 LargeInteger operator*(LargeInteger first, LargeInteger second)
 {
     if (first.isNull() || second.isNull())
@@ -477,6 +478,11 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
     LargeInteger zero(0);
     LargeInteger result(1);
 
+    if (expo == 1)
+    {
+        return base % mod;
+    }
+
     if (expo.isEven() == false)
     {
         result = base % mod;
@@ -484,13 +490,172 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
 
     while (expo != zero)
     {
-        expo = expo / 2;
-        base = (base * base) % mod;
+        expo = expo.divide_by_2();
+        base = base * base % mod;
 
         if (expo.isEven() == false)
         {
-            result = (result * base) % mod;
+            result = multiply(result, base, mod);
         }
+    }
+
+    return result;
+}
+
+string BinaryAdd(string first, string second)
+{
+    while (first.length() < second.length())
+    {
+        first.append("0");
+    }
+
+    while (first.length() > second.length())
+    {
+        second.append("0");
+    }
+
+    string result;
+    int n = first.length();
+    int carry = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        int firstBit = first[i] - ZERO;
+        int secondBit = second[i] - ZERO;
+
+        // sum by using xor
+        int sum = (firstBit ^ secondBit ^ carry);
+
+        // cast sum to char and add to result
+        result = result + (char(ZERO + sum));
+
+        carry = (firstBit & secondBit) | (secondBit & carry) | (firstBit & carry);
+    }
+
+    if (carry)
+        result = result + '1';
+
+    return result;
+}
+
+LargeInteger BinaryMultiply(string first_bin, string second_bin)
+{
+    while (first_bin.length() < second_bin.length())
+    {
+        first_bin.append("0");
+    }
+
+    while (first_bin.length() > second_bin.length())
+    {
+        second_bin.append("0");
+    }
+
+    int n = first_bin.length();
+    if (n == 0)
+    {
+        return 0;
+    }
+
+    if (n == 1)
+    {
+        int result = (first_bin.at(0) - ZERO) * (second_bin.at(0) - ZERO);
+        return LargeInteger(result);
+    }
+
+    int first_half = n / 2;
+    int second_half = n - first_half;
+
+    string first_right = first_bin.substr(0, second_half);
+    string first_left = first_bin.substr(second_half, first_half);
+
+    string second_right = second_bin.substr(0, second_half);
+    string second_left = second_bin.substr(second_half, first_half);
+
+    LargeInteger P1 = BinaryMultiply(first_left, second_left);
+    LargeInteger P2 = BinaryMultiply(first_right, second_right);
+    LargeInteger P3 = BinaryMultiply(BinaryAdd(first_left, first_right), BinaryAdd(second_left, second_right));
+
+    LargeInteger power = pow(2, second_half);
+
+    LargeInteger result = P1 * pow(power, 2) + (P3 - P1 - P2) * power + P2;
+    return result;
+}
+
+LargeInteger fastMultiply(LargeInteger first, LargeInteger second)
+{
+    if (first.isNull() || second.isNull())
+        return LargeInteger();
+
+    if (first.isNegative() && second.isNegative())
+    {
+        return first.abs() * second.abs();
+    }
+
+    if (first.isNegative())
+    {
+        LargeInteger result = first.abs() * second;
+        return result.negative();
+    }
+
+    if (second.isNegative())
+    {
+        LargeInteger result = first * second.abs();
+        return result.negative();
+    }
+
+    // ------------- MARK: Karatsuba Algorithm ----------------
+    string first_bin = first.binary();
+    string second_bin = second.binary();
+
+    return BinaryMultiply(first_bin, second_bin);
+}
+
+LargeInteger multiply(LargeInteger first, LargeInteger second, LargeInteger mod)
+{
+    string binary = second.binary();
+    LargeInteger two(2);
+
+    LargeInteger result = (binary.at(0) == '1') ? first : 0;
+
+    for (int i = 1; i < binary.size(); i++)
+    {
+        first = (two * first) % mod;
+
+        if (binary.at(i) == '1')
+        {
+            result = (result + first) % mod;
+        }
+    }
+
+    return result;
+}
+
+LargeInteger LargeInteger::divide_by_2()
+{
+    LargeInteger result;
+    if (this->isNegative())
+    {
+        result = this->abs().divide_by_2().negative();
+    }
+    else
+    {
+        string resultStr = "";
+        string num_str = this->to_str();
+        int n = num_str.length();
+        int carry = 0;
+        int step = 15;
+
+        for (int i = 0; i < n; i += step)
+        {
+            string chunk = to_string(carry) + num_str.substr(i, 15);
+            long long num = stoll(chunk);
+            long long temp = num / 2;
+            int carry = num & 1;
+
+            resultStr = resultStr + to_string(temp);
+        }
+
+        result = LargeInteger(resultStr);
     }
 
     return result;

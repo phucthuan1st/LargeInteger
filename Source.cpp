@@ -22,9 +22,11 @@ bool checkPrimeFermat(LargeInteger n, LargeInteger k)
 	{
 		LargeInteger a;
 		a = Randomizer::randomizer()->next(2, n - 4);
+		cout << "Try number: " << a << endl;
 
 		// make sure n>4
 		LargeInteger _gcd = gcd(n, a);
+		cout << "gcd: " << _gcd << endl;
 
 		if (_gcd != one)
 		{
@@ -32,6 +34,7 @@ bool checkPrimeFermat(LargeInteger n, LargeInteger k)
 		}
 
 		LargeInteger powMod = pow(a, n - 1, n);
+		cout << "powMod: " << powMod << endl;
 
 		if (powMod != one)
 		{
@@ -42,53 +45,11 @@ bool checkPrimeFermat(LargeInteger n, LargeInteger k)
 	}
 	return true;
 }
-// check if n is Prime number using Miller-Rabin method
-bool millerRabin(LargeInteger n, LargeInteger k)
-{
-	LargeInteger a = Randomizer::randomizer()->next(2, n - 4);
-	LargeInteger b = pow(a, n, k);
-
-	if (b == 1 || b == n - 1)
-		return true;
-
-	LargeInteger sub_expo = n - 1;
-	while (k != sub_expo)
-	{
-		b = pow(b, 2, n);
-		k = k * 2;
-
-		if (b == 1)
-			return false;
-		if (b == n - 1)
-			return true;
-	}
-	return false;
-}
-bool checkPrimeMillerRabin(LargeInteger n, LargeInteger k)
-{
-	if (n < 1 || n == 4)
-		return false;
-
-	if (n <= 3)
-		return true;
-	// Find c that n = 2^k * c + 1, r >= 1
-	LargeInteger c = n - 1;
-	while (c % 2 == 0)
-	{
-		c = c / 2;
-	}
-	while (k > 0)
-	{
-		if (!millerRabin(c, n))
-			return false;
-	}
-	return true;
-}
 
 // int main()
 // {
-// 	LargeInteger n(323170076712), k(1000);
-// 	LargeInteger test(8168);
+// 	LargeInteger n("89884656743115795386465259539451236680898848947115328636715040578866337902750481566354238661203768010560056939935696678829394884407208311246423715319737062188883946712432742638151109800623047059726541476042502884419075341171231440736956555270413618581675255342293149119973622969239858152417678164812112122095"),
+// 		k(10);
 
 // 	auto start = clock();
 // 	if (checkPrimeFermat(n, k) == true)

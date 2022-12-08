@@ -102,8 +102,8 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
 
     while (a.isEven() && b.isEven())
     {
-        a = a / two;
-        b = b / two;
+        a = a.divide_by_2();
+        b = b.divide_by_2();
         g = g * two;
     }
 
@@ -112,16 +112,16 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
 
         while (a.isEven())
         {
-            a = a / two;
+            a = a.divide_by_2();
         }
 
         while (b.isEven())
         {
-            b = b / two;
+            b = b.divide_by_2();
         }
 
         LargeInteger sub = (a > b) ? (a - b) : (b - a);
-        t = sub / two;
+        t = sub.divide_by_2();
 
         if (a >= b)
         {
@@ -136,4 +136,29 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
     g = g * b;
 
     return g;
+}
+
+string LargeInteger::binary()
+{
+    LargeInteger two(2);
+    LargeInteger zero(0);
+    string result;
+    LargeInteger clone(*this);
+
+    while (clone != zero)
+    {
+        // cout << "Clone = " << clone << endl;
+        if (clone.isEven())
+        {
+            result.append("0");
+        }
+        else
+        {
+            result.append("1");
+        }
+
+        clone = clone.divide_by_2();
+    }
+
+    return result;
 }
