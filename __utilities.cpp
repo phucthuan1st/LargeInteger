@@ -181,22 +181,22 @@ bool checkPrimeFermat(LargeInteger n, LargeInteger k)
     {
         LargeInteger a;
         a = Randomizer::randomizer()->next(2, n - 4);
-        cout << "Try number: " << a << endl;
+        cout << "Try number: " << a;
 
         // make sure n>4
         LargeInteger _gcd = gcd(n, a);
-        cout << "gcd: " << _gcd << endl;
 
         if (_gcd != one)
         {
+            cout << " - Failed!" << endl;
             return false;
         }
 
         LargeInteger powMod = pow(a, n - 1, n);
-        cout << "powMod: " << powMod << endl;
 
         if (powMod != one)
         {
+            cout << " - Failed!" << endl;
             return false;
         }
 

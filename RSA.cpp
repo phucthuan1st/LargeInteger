@@ -1,7 +1,7 @@
 
 #include "LargeInteger.h"
 #include "Randomizer.h"
-//#include <bits/stdc++.h>
+// #include <bits/stdc++.h>
 #include <math.h>
 using namespace std;
 
@@ -26,32 +26,47 @@ LargeInteger karat(LargeInteger first, LargeInteger second)
         LargeInteger z2 = karat(a, c);
         return pow(z2 * 10, 2 * m2) + pow((z1 - z2 - z0) * 10, m2) + z0;
     }
-
 }
 
-void modRandom(LargeInteger& p, LargeInteger& q, int size)
+void modRandom(LargeInteger &p, LargeInteger &q, int size)
 {
-    LargeInteger min = pow(2, size-1) +1;
-    LargeInteger max = pow(2, size) -1;
-    do{
-        p = Randomizer::randomizer()->next(min, max);
-        q = Randomizer::randomizer()->next(min, max);
-    } while (p==q);
-    
-    p = pow(p, 8);
-    q = pow(q, 8);
-    cout << " p = " << p << endl;
-    cout << " q = " << q << endl;
+    if (size == 2048)
+    {
+        p = Randomizer::randomizer()->next();
+        q = Randomizer::randomizer()->next();
+    }
+    else
+    {
+        LargeInteger upper_limit;
+
+        if (size == 512)
+        {
+            upper_limit = constant::quarterMaxLargeInt;
+        }
+        else if (size == 1024)
+        {
+            upper_limit = constant::halfMaxLargeInt;
+        }
+
+        LargeInteger lower_limit = upper_limit.divide_by_2();
+
+        p = Randomizer::randomizer()->next(lower_limit, upper_limit);
+        q = Randomizer::randomizer()->next(lower_limit, upper_limit);
+    }
+
+    p = p * p;
+    q = q * q;
+
+    cout << "p = " << p << endl
+         << "q = " << q << endl;
 }
 
-
-
-LargeInteger getN(LargeInteger& p, LargeInteger& q)
+LargeInteger getN(LargeInteger &p, LargeInteger &q)
 {
     return p * q;
 }
 
-LargeInteger getPhi(LargeInteger& p, LargeInteger& q)
+LargeInteger getPhi(LargeInteger &p, LargeInteger &q)
 {
     return (p - 1) * (q - 1);
 }
@@ -68,9 +83,9 @@ LargeInteger getE(LargeInteger p, LargeInteger Phi)
     return k;
 }
 
-LargeInteger gcdExtend(LargeInteger e, LargeInteger Phi, LargeInteger& x, LargeInteger& y)
+LargeInteger gcdExtend(LargeInteger e, LargeInteger Phi, LargeInteger &x, LargeInteger &y)
 {
-    LargeInteger m,n,xn,yn,q,r,xr,yr;
+    LargeInteger m, n, xn, yn, q, r, xr, yr;
     m = e;
     n = Phi;
     x = 1;
@@ -91,8 +106,6 @@ LargeInteger gcdExtend(LargeInteger e, LargeInteger Phi, LargeInteger& x, LargeI
         yn = yr;
     }
     return x * e + y * Phi;
-    
-
 }
 
 LargeInteger getD(LargeInteger e, LargeInteger Phi)
@@ -109,30 +122,28 @@ void RSA_generate()
 
     do
     {
-        //LargeInteger p("81667666731381968629729850711821949266170263745435245318162921790698204440889");
-        //LargeInteger q("94557710432295226681523559782106150460252964675161271496844866938830362575507");
         LargeInteger p, q, k, l;
-        cout <<"Select the size of the RSA key you want to generate: "<<endl;
-        cout <<"1. 512 bits"<<endl;
-        cout <<"2. 1024 bits" <<endl;
-        cout <<"3. 2048 bits"<<endl;
-        cout <<"4. Quit"<<endl;
+        cout << "Select the size of the RSA key you want to generate: " << endl;
+        cout << "1. 512 bits" << endl;
+        cout << "2. 1024 bits" << endl;
+        cout << "3. 2048 bits" << endl;
+        cout << "4. Quit" << endl;
         cin >> check;
 
         if (check == 1)
-            modRandom(p, q, 32);
-        else if(check ==2)
-            modRandom(p, q, 64);
-        else if(check == 3)
-            modRandom(p, q, 128);
-
-    
+            modRandom(p, q, 512);
+        else if (check == 2)
+            modRandom(p, q, 1024);
+        else if (check == 3)
+            modRandom(p, q, 2048);
+        else
+            return;
 
         if (p.isEven())
-            p = p+1;
+            p = p + 1;
 
         if (q.isEven())
-            q = q+1;
+            q = q + 1;
 
         k = 50;
 
@@ -154,30 +165,18 @@ void RSA_generate()
         cout << "n = " << n << endl;
         cout << "phi = " << phi << endl;
         cout << "e = " << e << endl;
-        cout << "d = " << d<<endl;
-    } while (check!=4);
-
-
+        cout << "d = " << d << endl;
+    } while (check != 4);
 }
 
 int main()
 {
     auto start = clock();
-    //RSA_generate();
-   
-    //LargeInteger p("81667666731381968629729850711821949266170263745435245318162921790698204440889");
-    //LargeInteger q= 3757399441;
-    //cout << p << endl;
-    //cout << checkPrimeFermat(q, 10) << endl;
-    LargeInteger a=7;
-    LargeInteger b=146;
-    
-    cout << gcd(a, b) << endl;
+    RSA_generate();
     auto end = clock();
 
     double time = double(end - start) / CLOCKS_PER_SEC;
     cout << "Finished in " << time << "seconds" << endl;
 
-    
     return 0;
 }
