@@ -26,12 +26,12 @@ LargeInteger operator+(LargeInteger first, LargeInteger second)
 
     if (first.isNegative())
     {
-        return second - first;
+        return second - first.abs();
     }
 
     if (second.isNegative())
     {
-        return first - second;
+        return first - second.abs();
     }
 
     int n = second.digitNum();
