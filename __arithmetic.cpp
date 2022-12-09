@@ -75,7 +75,7 @@ LargeInteger operator-(LargeInteger first, LargeInteger second)
 
     if (first == 0)
     {
-        return second;
+        return second.negative();
     }
 
     if (second == 0)
@@ -114,6 +114,12 @@ LargeInteger operator-(LargeInteger first, LargeInteger second)
         return first + second_abs;
     }
 
+    if (second > first)
+    {
+        result = second - first;
+        return result.negative();
+    }
+
     int n = second.digitNum();
     int m = first.digitNum();
 
@@ -141,7 +147,7 @@ LargeInteger operator-(LargeInteger first, LargeInteger second)
 
     vector<char> bigger = (m > n) ? first.digits : second.digits;
 
-    for (int i = minNum; i < maxNum; i++)
+    for (int i = minNum; i < m; i++)
     {
         int temp = (bigger[i] - ZERO) - save;
 

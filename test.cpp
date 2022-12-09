@@ -8,7 +8,7 @@ int main()
     LargeInteger mod(17);
 
     auto start = clock();
-    cout << constant::maxLargeInt * constant::maxLargeInt << endl;
+    cout << LargeInteger(7) - LargeInteger(145) << endl;
     auto end = clock();
     double time = double(end - start) / CLOCKS_PER_SEC;
     cout << "Slow multiply finished in " << time << "seconds" << endl;
