@@ -2,28 +2,28 @@
 #include "Randomizer.h"
 using namespace std;
 
-LargeInteger karat(LargeInteger first, LargeInteger second)
-{
-    if (first.digitNum() == 1 || second.digitNum() == 1)
-    {
-        return first * second;
-    }
-    else
-    {
-        LargeInteger m = max(first.digitNum(), second.digitNum());
-        LargeInteger m2 = m / 2;
-        LargeInteger a = pow(first / 10, m2);
-        LargeInteger b = pow(first % 10, m2);
-        LargeInteger c = pow(second / 10, m2);
-        LargeInteger d = pow(second % 10, m2);
-        LargeInteger z0 = karat(b, d);
-        cout << z0 << endl;
-        LargeInteger z1 = karat(a + b, c + d);
-        cout << z0 << endl;
-        LargeInteger z2 = karat(a, c);
-        return pow(z2 * 10, 2 * m2) + pow((z1 - z2 - z0) * 10, m2) + z0;
-    }
-}
+// LargeInteger karat(LargeInteger first, LargeInteger second)
+// {
+//     if (first.digitNum() == 1 || second.digitNum() == 1)
+//     {
+//         return first * second;
+//     }
+//     else
+//     {
+//         LargeInteger m = max(first.digitNum(), second.digitNum());
+//         LargeInteger m2 = m / 2;
+//         LargeInteger a = pow(first / 10, m2);
+//         LargeInteger b = pow(first % 10, m2);
+//         LargeInteger c = pow(second / 10, m2);
+//         LargeInteger d = pow(second % 10, m2);
+//         LargeInteger z0 = karat(b, d);
+//         cout << z0 << endl;
+//         LargeInteger z1 = karat(a + b, c + d);
+//         cout << z0 << endl;
+//         LargeInteger z2 = karat(a, c);
+//         return pow(z2 * 10, 2 * m2) + pow((z1 - z2 - z0) * 10, m2) + z0;
+//     }
+// }
 
 void modRandom(LargeInteger &p, LargeInteger &q, int size)
 {
@@ -108,7 +108,7 @@ LargeInteger getD(LargeInteger e, LargeInteger Phi)
 
 void RSA_generate()
 {
-    int check = 0;
+    int check = 1;
     cout << "Select the size of the RSA key you want to generate: " << endl;
     cout << "1. 512 bits" << endl;
     cout << "2. 1024 bits" << endl;
@@ -117,33 +117,33 @@ void RSA_generate()
     do
     {
         LargeInteger p(2386421887), q(4238399051), k, l;
-        cout << "-----------" << endl
-             << "Your choice: ";
-        cin >> check;
+        // cout << "-----------" << endl
+        //      << "Your choice: ";
+        // cin >> check;
 
-        // if (check == 1)
-        //     modRandom(p, q, 512);
-        // else if (check == 2)
-        //     modRandom(p, q, 1024);
-        // else if (check == 3)
-        //     modRandom(p, q, 2048);
-        // else
-        //     continue;
+        if (check == 1)
+            modRandom(p, q, 512);
+        else if (check == 2)
+            modRandom(p, q, 1024);
+        else if (check == 3)
+            modRandom(p, q, 2048);
+        else
+            continue;
 
-        // if (p.isEven())
-        //     p = p + 1;
+        if (p.isEven())
+            p = p + 1;
 
-        // if (q.isEven())
-        //     q = q + 1;
+        if (q.isEven())
+            q = q + 1;
 
-        // while (checkPrimeFermat(p) == 0)
-        // {
-        //     p = p + 2;
-        // }
-        // while (checkPrimeFermat(q) == 0)
-        // {
-        //     q = q + 2;
-        // }
+        while (checkPrimeFermat(p) == 0)
+        {
+            p = p + 2;
+        }
+        while (checkPrimeFermat(q) == 0)
+        {
+            q = q + 2;
+        }
 
         LargeInteger n = getN(p, q);
         LargeInteger phi = getPhi(p, q);

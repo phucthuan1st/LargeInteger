@@ -51,8 +51,9 @@ public:
     // get negative form of the number
     LargeInteger negative();
 
-    // divide by 2
     LargeInteger divide_by_2();
+    LargeInteger divide_by_10();
+    int last_digit();
 
     // get binary string representation
     string binary();
@@ -104,6 +105,8 @@ public:
     friend LargeInteger operator*(unsigned long long first, LargeInteger second);
     friend LargeInteger operator/(unsigned long long dividend, LargeInteger divisor);
     friend LargeInteger operator%(unsigned long long dividend, LargeInteger divisor);
+
+    friend LargeInteger schonhageStrassenMultiplication(LargeInteger a, LargeInteger b);
 };
 
 LargeInteger pow(LargeInteger base, LargeInteger expo);

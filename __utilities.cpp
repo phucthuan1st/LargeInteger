@@ -164,6 +164,66 @@ string LargeInteger::binary()
     return result;
 }
 
+LargeInteger LargeInteger::divide_by_2()
+{
+    LargeInteger result;
+    if (this->isNegative())
+    {
+        result = this->abs().divide_by_2().negative();
+    }
+    else
+    {
+        string resultStr = "";
+        string num_str = this->to_str();
+        int n = num_str.length();
+        int carry = 0;
+        int step = 15;
+
+        for (int i = 0; i < n; i += step)
+        {
+            string chunk = to_string(carry) + num_str.substr(i, 15);
+            long long num = stoll(chunk);
+            long long temp = num / 2;
+            int carry = num & 1;
+
+            resultStr = resultStr + to_string(temp);
+        }
+
+        result = LargeInteger(resultStr);
+    }
+
+    return result;
+}
+
+LargeInteger LargeInteger::divide_by_10()
+{
+    if (*this == 0)
+    {
+        return 0;
+    }
+
+    if (this->isNegative())
+    {
+        return this->abs().divide_by_10().negative();
+    }
+
+    string digits = this->to_str();
+    if (digits.length() > 1)
+    {
+        digits.pop_back();
+    }
+    return LargeInteger(digits);
+}
+
+int LargeInteger::last_digit()
+{
+    string digits = this->to_str();
+
+    int last_digit = digits.at(digits.size() - 1) - ZERO;
+
+    return last_digit;
+}
+
 // using little Fermat to check if n is Prime number method with k tries
 bool checkPrimeFermat(LargeInteger n, LargeInteger k)
 {
@@ -176,28 +236,30 @@ bool checkPrimeFermat(LargeInteger n, LargeInteger k)
     if (n <= 3)
         return true;
 
+    LargeInteger step = pow(2, k + 1);
+    LargeInteger min(2);
     // try k times if n if satisfied a^(n-1) congruent with n
     while (k > 0)
     {
         LargeInteger a;
-        a = Randomizer::randomizer()->next(2, n - 4);
+        a = Randomizer::randomizer()->next(min, n / step);
 
         // make sure n>4
         LargeInteger _gcd = gcd(n, a);
-
         if (_gcd != one)
         {
             return false;
         }
 
         LargeInteger powMod = pow(a, n - 1, n);
-
         if (powMod != one)
         {
             return false;
         }
 
         k = k - one;
+        min = n / step;
+        step = step.divide_by_2();
     }
     return true;
 }

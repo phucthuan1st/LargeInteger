@@ -622,7 +622,7 @@ LargeInteger multiply(LargeInteger first, LargeInteger second, LargeInteger mod)
 
     for (int i = 1; i < binary.size(); i++)
     {
-        first = (two * first) % mod;
+        first = two * first % mod;
 
         if (binary.at(i) == '1')
         {
@@ -633,33 +633,45 @@ LargeInteger multiply(LargeInteger first, LargeInteger second, LargeInteger mod)
     return result;
 }
 
-LargeInteger LargeInteger::divide_by_2()
+LargeInteger schonhageStrassenMultiplication(LargeInteger x, LargeInteger y)
 {
-    LargeInteger result;
-    if (this->isNegative())
-    {
-        result = this->abs().divide_by_2().negative();
-    }
-    else
-    {
-        string resultStr = "";
-        string num_str = this->to_str();
-        int n = num_str.length();
-        int carry = 0;
-        int step = 15;
+    int n = x.digitNum();
+    int m = y.digitNum();
 
-        for (int i = 0; i < n; i += step)
+    LargeInteger linearConvolution[n + m - 1];
+    for (int i = 0; i < (n + m - 1); i++)
+        linearConvolution[i] = 0;
+
+    LargeInteger p = x;
+    for (int i = 0; i < m; i++)
+    {
+        x = p;
+        for (int j = 0; j < n; j++)
         {
-            string chunk = to_string(carry) + num_str.substr(i, 15);
-            long long num = stoll(chunk);
-            long long temp = num / 2;
-            int carry = num & 1;
-
-            resultStr = resultStr + to_string(temp);
+            linearConvolution[i + j] = linearConvolution[i + j] + y.last_digit() * x.last_digit();
+            x = x.divide_by_10();
         }
-
-        result = LargeInteger(resultStr);
+        y = y.divide_by_10();
     }
 
-    return result;
+    LargeInteger product(0);
+    LargeInteger nextCarry(0), base(1);
+
+    for (int i = 0; i < n + m - 1; i++)
+    {
+        linearConvolution[i] = linearConvolution[i] + nextCarry;
+        product = product + (base * (linearConvolution[i].last_digit()));
+        nextCarry = linearConvolution[i].divide_by_10();
+        base = base.multiply_pow_10(1);
+    }
+
+    if (nextCarry != 0)
+    {
+        for (auto &digit : nextCarry.digits)
+        {
+            product.digits.push_back(digit);
+        }
+    }
+
+    return product;
 }
