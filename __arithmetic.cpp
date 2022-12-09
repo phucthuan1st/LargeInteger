@@ -484,24 +484,24 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
     LargeInteger zero(0);
     LargeInteger result(1);
 
-    if (expo == 1)
+    if (expo == zero)
     {
-        return base % mod;
+        return result;
     }
 
-    if (expo.isEven() == false)
+    string exBinary = expo.binary();
+    if (exBinary.at(0) == '1')
     {
-        result = base % mod;
+        result = base;
     }
 
-    while (expo != zero)
+    for (int i = 1; i < exBinary.length(); i++)
     {
-        expo = expo.divide_by_2();
         base = multiply(base, base, mod);
 
-        if (expo.isEven() == false)
+        if (exBinary.at(i) == '1')
         {
-            result = multiply(result, base, mod);
+            result = multiply(base, result, mod);
         }
     }
 

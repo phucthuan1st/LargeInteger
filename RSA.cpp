@@ -1,8 +1,5 @@
-
 #include "LargeInteger.h"
 #include "Randomizer.h"
-// #include <bits/stdc++.h>
-#include <math.h>
 using namespace std;
 
 LargeInteger karat(LargeInteger first, LargeInteger second)
@@ -30,10 +27,14 @@ LargeInteger karat(LargeInteger first, LargeInteger second)
 
 void modRandom(LargeInteger &p, LargeInteger &q, int size)
 {
+    auto start = clock();
     if (size == 2048)
     {
         p = Randomizer::randomizer()->next();
         q = Randomizer::randomizer()->next();
+
+        p = p * p;
+        q = q * q;
     }
     else
     {
@@ -52,13 +53,13 @@ void modRandom(LargeInteger &p, LargeInteger &q, int size)
 
         p = Randomizer::randomizer()->next(lower_limit, upper_limit);
         q = Randomizer::randomizer()->next(lower_limit, upper_limit);
+
+        p = p * p;
+        q = p * p;
     }
-
-    p = p * p;
-    q = q * q;
-
-    cout << "p = " << p << endl
-         << "q = " << q << endl;
+    auto end = clock();
+    double time = double(end - start) / CLOCKS_PER_SEC;
+    cout << "time: " << time << endl;
 }
 
 LargeInteger getN(LargeInteger &p, LargeInteger &q)
