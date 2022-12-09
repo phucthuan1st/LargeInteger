@@ -1,4 +1,5 @@
 #include "LargeInteger.h"
+#include "Randomizer.h"
 
 void LargeInteger::cleanup()
 {
@@ -161,4 +162,45 @@ string LargeInteger::binary()
     }
 
     return result;
+}
+
+// using little Fermat to check if n is Prime number method with k tries
+bool checkPrimeFermat(LargeInteger n, LargeInteger k)
+{
+    LargeInteger one(1);
+    LargeInteger zero(0);
+
+    if (n < 1 || n == 4)
+        return false;
+
+    if (n <= 3)
+        return true;
+
+    // try k times if n if satisfied a^(n-1) congruent with n
+    while (k > 0)
+    {
+        LargeInteger a;
+        a = Randomizer::randomizer()->next(2, n - 4);
+        cout << "Try number: " << a << endl;
+
+        // make sure n>4
+        LargeInteger _gcd = gcd(n, a);
+        cout << "gcd: " << _gcd << endl;
+
+        if (_gcd != one)
+        {
+            return false;
+        }
+
+        LargeInteger powMod = pow(a, n - 1, n);
+        cout << "powMod: " << powMod << endl;
+
+        if (powMod != one)
+        {
+            return false;
+        }
+
+        k = k - one;
+    }
+    return true;
 }

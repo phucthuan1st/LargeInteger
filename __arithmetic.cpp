@@ -497,7 +497,7 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
     while (expo != zero)
     {
         expo = expo.divide_by_2();
-        base = base * base % mod;
+        base = multiply(base, base, mod);
 
         if (expo.isEven() == false)
         {
