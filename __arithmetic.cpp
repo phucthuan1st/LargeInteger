@@ -467,15 +467,20 @@ LargeInteger operator%(unsigned long long first, LargeInteger second)
 
 LargeInteger pow(LargeInteger base, LargeInteger expo)
 {
-    LargeInteger result(1);
-
-    while (expo > 0)
+    if (expo == 0)
     {
-        result = result * base;
-        expo = expo - 1;
+        return LargeInteger(1);
     }
 
-    return result;
+    LargeInteger result = pow(base, expo.divide_by_2());
+    if (expo.isEven())
+    {
+        return result * result;
+    }
+    else
+    {
+        return result * result * base;
+    }
 }
 
 // calculate base^expo % mod
@@ -484,25 +489,17 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
     LargeInteger zero(0);
     LargeInteger result(1);
 
-    if (expo == zero)
-    {
-        return result;
-    }
+    base = base % mod;
 
-    string exBinary = expo.binary();
-    if (exBinary.at(0) == '1')
+    while (expo > zero)
     {
-        result = base;
-    }
-
-    for (int i = 1; i < exBinary.length(); i++)
-    {
-        base = multiply(base, base, mod);
-
-        if (exBinary.at(i) == '1')
+        if (!expo.isEven())
         {
-            result = multiply(base, result, mod);
+            result = multiply(result, base, mod);
         }
+
+        base = multiply(base, base, mod);
+        expo = expo.divide_by_2();
     }
 
     return result;

@@ -27,7 +27,6 @@ LargeInteger karat(LargeInteger first, LargeInteger second)
 
 void modRandom(LargeInteger &p, LargeInteger &q, int size)
 {
-    auto start = clock();
     if (size == 2048)
     {
         p = Randomizer::randomizer()->next();
@@ -57,9 +56,6 @@ void modRandom(LargeInteger &p, LargeInteger &q, int size)
         p = p * p;
         q = p * p;
     }
-    auto end = clock();
-    double time = double(end - start) / CLOCKS_PER_SEC;
-    cout << "time: " << time << endl;
 }
 
 LargeInteger getN(LargeInteger &p, LargeInteger &q)
@@ -72,41 +68,34 @@ LargeInteger getPhi(LargeInteger &p, LargeInteger &q)
     return (p - 1) * (q - 1);
 }
 
-LargeInteger getE(LargeInteger p, LargeInteger Phi)
+LargeInteger getE(LargeInteger Phi)
 {
-    LargeInteger k;
     for (LargeInteger e = 100; e < 1000000; e = e + 1)
     {
         if (gcd(e, Phi) == 1)
-            k = e;
-        break;
+        {
+            return e;
+        }
     }
-    return k;
+
+    return LargeInteger(0);
 }
 
-LargeInteger gcdExtend(LargeInteger e, LargeInteger Phi, LargeInteger &x, LargeInteger &y)
+LargeInteger gcdExtend(LargeInteger a, LargeInteger b, LargeInteger &x, LargeInteger &y)
 {
-    LargeInteger m, n, xn, yn, q, r, xr, yr;
-    m = e;
-    n = Phi;
-    x = 1;
-    y = 0;
-    xn = 0;
-    yn = 1;
-    while (n != 0)
+    if (b == 0)
     {
-        q = m / n;
-        r = m % n;
-        xr = x - q * xn;
-        yr = y - q * yn;
-        m = n;
-        x = xn;
-        y = yn;
-        n = r;
-        xn = xr;
-        yn = yr;
+        x = LargeInteger(1);
+        y = LargeInteger(0);
+        return a;
     }
-    return x * e + y * Phi;
+
+    LargeInteger x1, y1;
+    LargeInteger d = gcdExtend(b, a % b, x1, y1);
+
+    x = y1;
+    y = x1 - y1 * (a / b);
+    return d;
 }
 
 LargeInteger getD(LargeInteger e, LargeInteger Phi)
@@ -120,49 +109,49 @@ LargeInteger getD(LargeInteger e, LargeInteger Phi)
 void RSA_generate()
 {
     int check = 0;
-
+    cout << "Select the size of the RSA key you want to generate: " << endl;
+    cout << "1. 512 bits" << endl;
+    cout << "2. 1024 bits" << endl;
+    cout << "3. 2048 bits" << endl;
+    cout << "4. Quit" << endl;
     do
     {
-        LargeInteger p, q, k, l;
-        cout << "Select the size of the RSA key you want to generate: " << endl;
-        cout << "1. 512 bits" << endl;
-        cout << "2. 1024 bits" << endl;
-        cout << "3. 2048 bits" << endl;
-        cout << "4. Quit" << endl;
+        LargeInteger p(2386421887), q(4238399051), k, l;
+        cout << "-----------" << endl
+             << "Your choice: ";
         cin >> check;
 
-        if (check == 1)
-            modRandom(p, q, 512);
-        else if (check == 2)
-            modRandom(p, q, 1024);
-        else if (check == 3)
-            modRandom(p, q, 2048);
-        else
-            return;
+        // if (check == 1)
+        //     modRandom(p, q, 512);
+        // else if (check == 2)
+        //     modRandom(p, q, 1024);
+        // else if (check == 3)
+        //     modRandom(p, q, 2048);
+        // else
+        //     continue;
 
-        if (p.isEven())
-            p = p + 1;
+        // if (p.isEven())
+        //     p = p + 1;
 
-        if (q.isEven())
-            q = q + 1;
+        // if (q.isEven())
+        //     q = q + 1;
 
-        k = 50;
+        // while (checkPrimeFermat(p) == 0)
+        // {
+        //     p = p + 2;
+        // }
+        // while (checkPrimeFermat(q) == 0)
+        // {
+        //     q = q + 2;
+        // }
 
-        while (checkPrimeFermat(p, k) == 0)
-        {
-            p = p + 2;
-        }
-        while (checkPrimeFermat(q, k) == 0)
-        {
-            q = q + 2;
-        }
+        LargeInteger n = getN(p, q);
+        LargeInteger phi = getPhi(p, q);
+        LargeInteger e = getE(phi);
+        LargeInteger d = getD(e, phi);
 
         cout << "p = " << p << endl;
         cout << "q = " << q << endl;
-        LargeInteger n = getN(p, q);
-        LargeInteger phi = getPhi(p, q);
-        LargeInteger e = getE(p, phi);
-        LargeInteger d = getD(e, phi);
         cout << "n = " << n << endl;
         cout << "phi = " << phi << endl;
         cout << "e = " << e << endl;

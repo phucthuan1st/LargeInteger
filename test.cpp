@@ -5,11 +5,9 @@
 
 // int main()
 // {
-//     LargeInteger mod(17);
 
 //     auto start = clock();
-//     for (int i = 0; i < 10; i++)
-//         cout << Randomizer::randomizer()->next(1, 100) << endl;
+//     cout << pow(constant::maxLargeInt, constant::maxLargeInt - 1);
 //     auto end = clock();
 //     double time = double(end - start) / CLOCKS_PER_SEC;
 //     cout << "Slow multiply finished in " << time << "seconds" << endl;

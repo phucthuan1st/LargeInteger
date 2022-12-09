@@ -113,7 +113,7 @@ LargeInteger multiply(LargeInteger first, LargeInteger second, LargeInteger mod)
 LargeInteger fastMultiply(LargeInteger first, LargeInteger second);
 LargeInteger BinaryMultiply(string first_bin, string second_bin);
 string BinaryAdd(string first, string second);
-bool checkPrimeFermat(LargeInteger n, LargeInteger k);
+bool checkPrimeFermat(LargeInteger n, LargeInteger k = 5);
 
 namespace constant
 {
