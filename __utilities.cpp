@@ -84,10 +84,10 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
     if (a.isNull() || b.isNull())
         return LargeInteger();
 
-    if (a == 0)
+    if (a == constant::zero)
         return b;
 
-    if (b == 0)
+    if (b == constant::zero)
         return a;
     // MARK: End Special cases!
 
@@ -95,9 +95,7 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
     if (b > a)
         return gcd(b, a);
 
-    LargeInteger zero(0);
-    LargeInteger two(2);
-    LargeInteger g(1);
+    LargeInteger g(constant::one);
 
     LargeInteger t;
 
@@ -105,10 +103,10 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
     {
         a = a.divide_by_2();
         b = b.divide_by_2();
-        g = g * two;
+        g = g * constant::two;
     }
 
-    while (a > 0)
+    while (a > constant::zero)
     {
 
         while (a.isEven())
@@ -141,12 +139,11 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
 
 string LargeInteger::binary()
 {
-    LargeInteger two(2);
-    LargeInteger zero(0);
+
     string result;
     LargeInteger clone(*this);
 
-    while (clone != zero)
+    while (clone != constant::zero)
     {
         // cout << "Clone = " << clone << endl;
         if (clone.isEven())
@@ -197,9 +194,9 @@ LargeInteger LargeInteger::divide_by_2()
 
 LargeInteger LargeInteger::divide_by_10()
 {
-    if (*this == 0)
+    if (*this == constant::zero)
     {
-        return 0;
+        return constant::zero;
     }
 
     if (this->isNegative())
@@ -225,10 +222,8 @@ int LargeInteger::last_digit()
 }
 
 // using little Fermat to check if n is Prime number method with k tries
-bool checkPrimeFermat(LargeInteger n, LargeInteger k)
+bool checkPrimeFermat(LargeInteger n, int k)
 {
-    LargeInteger one(1);
-    LargeInteger zero(0);
 
     if (n < 1 || n == 4)
         return false;
@@ -237,7 +232,7 @@ bool checkPrimeFermat(LargeInteger n, LargeInteger k)
         return true;
 
     LargeInteger step = pow(2, k + 1);
-    LargeInteger min(2);
+    LargeInteger min(constant::two);
     // try k times if n if satisfied a^(n-1) congruent with n
     while (k > 0)
     {
@@ -246,18 +241,23 @@ bool checkPrimeFermat(LargeInteger n, LargeInteger k)
 
         // make sure n>4
         LargeInteger _gcd = gcd(n, a);
-        if (_gcd != one)
+        if (_gcd != constant::one)
         {
             return false;
         }
 
+        auto start = clock();
         LargeInteger powMod = pow(a, n - 1, n);
-        if (powMod != one)
+        auto end = clock();
+        double time = double(end - start) / CLOCKS_PER_SEC;
+
+        cout << "PowMod = " << powMod << " Finished in " << time << "seconds" << endl;
+        if (powMod != constant::one)
         {
             return false;
         }
 
-        k = k - one;
+        k = k - 1;
         min = n / step;
         step = step.divide_by_2();
     }

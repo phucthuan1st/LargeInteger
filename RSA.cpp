@@ -116,10 +116,11 @@ void RSA_generate()
     cout << "4. Quit" << endl;
     do
     {
-        LargeInteger p(2386421887), q(4238399051), k, l;
-        // cout << "-----------" << endl
-        //      << "Your choice: ";
-        // cin >> check;
+        LargeInteger p(2386421887), q(4238399051), l;
+        int k;
+        cout << "-----------" << endl
+             << "Your choice: ";
+        cin >> check;
 
         if (check == 1)
             modRandom(p, q, 512);

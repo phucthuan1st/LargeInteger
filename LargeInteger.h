@@ -116,7 +116,7 @@ LargeInteger multiply(LargeInteger first, LargeInteger second, LargeInteger mod)
 LargeInteger fastMultiply(LargeInteger first, LargeInteger second);
 LargeInteger BinaryMultiply(string first_bin, string second_bin);
 string BinaryAdd(string first, string second);
-bool checkPrimeFermat(LargeInteger n, LargeInteger k = 5);
+bool checkPrimeFermat(LargeInteger n, int k = 5);
 
 namespace constant
 {
@@ -139,4 +139,9 @@ namespace constant
     const LargeInteger A(multiplying);
     const LargeInteger B(increment);
     const LargeInteger diff = maxLargeInt - subMaxLargeInt + 1;
+
+    const LargeInteger zero("0");
+    const LargeInteger one("1");
+    const LargeInteger two("2");
+    const LargeInteger ten("2");
 }

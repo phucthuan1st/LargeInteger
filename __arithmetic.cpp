@@ -217,57 +217,81 @@ LargeInteger operator*(LargeInteger first, LargeInteger second)
 
     int n = f + s;
 
-    vector<int> pow_sum(n, 0);
-    for (unsigned int i = 0; i < f; i++)
+    vector<int> result(n, 0);
+
+    int i_n1 = 0;
+    int i_n2 = 0;
+
+    // Go from right to left in first
+    for (int i = 0; i <= f - 1; i++)
     {
-        for (unsigned int j = 0; j < s; j++)
+        int carry = 0;
+        int n1 = first.digits[i] - ZERO;
+
+        // To shift position to left after every multiplication of a digit in second number
+        i_n2 = 0;
+
+        // Go from right to left in second
+        for (int j = 0; j <= s - 1; j++)
         {
-            int first_digit = (first.digits[i] - ZERO);
-            int second_digit = (second.digits[j] - ZERO);
+            // Take current digit of second number
+            int n2 = second.digits[j] - ZERO;
 
-            pow_sum[i + j] += first_digit * second_digit;
+            // Multiply with current digit of first number
+            // and add result to previously stored result
+            // at current position.
+            int sum = n1 * n2 + result[i_n1 + i_n2] + carry;
+
+            // Carry for next iteration
+            carry = sum / 10;
+
+            // Store result
+            result[i_n1 + i_n2] = sum % 10;
+
+            i_n2++;
         }
+
+        // store carry in next cell
+        if (carry > 0)
+            result[i_n1 + i_n2] += carry;
+
+        // To shift position to left after every
+        // multiplication of a digit in num1.
+        i_n1++;
     }
 
-    vector<LargeInteger> pow_sum_large;
+    int i = result.size() - 1;
+    while (i >= 0 && result[i] == '0')
+        i--;
 
-    for (int i = 0; i < pow_sum.size(); i++)
+    string str = "";
+    while (i >= 0)
     {
-        LargeInteger num = LargeInteger(pow_sum[i]);
-        num.multiply_pow_10(i);
-        pow_sum_large.push_back(num);
+        str = str + to_string(result[i--]);
     }
 
-    LargeInteger result(0);
+    LargeInteger res(str);
+    res.cleanup();
 
-    for (auto &sum : pow_sum_large)
-    {
-        result = result + sum;
-    }
-
-    result.cleanup();
-
-    return result;
+    return res;
 }
 
 LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
 {
-    LargeInteger zero(0);
-    LargeInteger one(1);
 
-    if (divisor == zero)
+    if (divisor == constant::zero)
     {
         throw("Division by zero");
     }
 
     if (divisor > dividend)
     {
-        return zero;
+        return constant::zero;
     }
 
     if (dividend == divisor)
     {
-        return one;
+        return constant::one;
     }
 
     if (dividend.isNegative() && divisor.isNegative())
@@ -314,16 +338,16 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
         }
 
         // multiplying and subtracting
-        LargeInteger quotient = one;
+        LargeInteger quotient = constant::one;
         LargeInteger save = quotient * divisor;
 
         while (save <= dv)
         {
-            quotient = quotient + one;
+            quotient = quotient + constant::one;
             save = quotient * divisor;
         }
 
-        quotient = quotient - one;
+        quotient = quotient - constant::one;
         save = quotient * divisor;
         dv = dv - save;
 
@@ -356,10 +380,7 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
         return result;
     }
 
-    LargeInteger zero(0);
-    LargeInteger one(1);
-
-    if (divisor == zero)
+    if (divisor == constant::zero)
     {
         throw("Division by zero");
     }
@@ -371,7 +392,7 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
 
     if (dividend == divisor)
     {
-        return zero;
+        return constant::zero;
     }
 
     int digit_pos = dividend.digitNum() - 1;
@@ -398,16 +419,16 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
         }
 
         // multiplying and subtracting
-        LargeInteger quotient = one;
+        LargeInteger quotient = constant::one;
         LargeInteger save = quotient * divisor;
 
         while (save <= dv)
         {
-            quotient = quotient + one;
+            quotient = quotient + constant::one;
             save = quotient * divisor;
         }
 
-        quotient = quotient - one;
+        quotient = quotient - constant::one;
         save = quotient * divisor;
         dv = dv - save;
     }
@@ -467,39 +488,57 @@ LargeInteger operator%(unsigned long long first, LargeInteger second)
 
 LargeInteger pow(LargeInteger base, LargeInteger expo)
 {
-    if (expo == 0)
+    LargeInteger result(constant::one);
+    if (expo == constant::zero)
     {
-        return LargeInteger(1);
+        return result;
     }
 
-    LargeInteger result = pow(base, expo.divide_by_2());
-    if (expo.isEven())
+    string bitset = expo.binary();
+
+    if (bitset.at(0) == '1')
     {
-        return result * result;
+        result = base;
     }
-    else
+
+    for (int i = 1; i < bitset.size(); i++)
     {
-        return result * result * base;
+        base = base * base;
+
+        if (bitset.at(i) == '1')
+        {
+            result = result * base;
+        }
     }
+
+    return result;
 }
 
 // calculate base^expo % mod
 LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
 {
-    LargeInteger zero(0);
-    LargeInteger result(1);
+    LargeInteger result(constant::one);
+    if (expo == constant::zero)
+    {
+        return result;
+    }
 
+    string bitset = expo.binary();
     base = base % mod;
 
-    while (expo > zero)
+    if (bitset.at(0) == '1')
     {
-        if (!expo.isEven())
+        result = base;
+    }
+
+    for (int i = 1; i < bitset.size(); i++)
+    {
+        base = multiply(base, base, mod);
+
+        if (bitset.at(i) == '1')
         {
             result = multiply(result, base, mod);
         }
-
-        base = multiply(base, base, mod);
-        expo = expo.divide_by_2();
     }
 
     return result;
@@ -541,88 +580,16 @@ string BinaryAdd(string first, string second)
     return result;
 }
 
-LargeInteger BinaryMultiply(string first_bin, string second_bin)
-{
-    while (first_bin.length() < second_bin.length())
-    {
-        first_bin.append("0");
-    }
-
-    while (first_bin.length() > second_bin.length())
-    {
-        second_bin.append("0");
-    }
-
-    int n = first_bin.length();
-    if (n == 0)
-    {
-        return 0;
-    }
-
-    if (n == 1)
-    {
-        int result = (first_bin.at(0) - ZERO) * (second_bin.at(0) - ZERO);
-        return LargeInteger(result);
-    }
-
-    int first_half = n / 2;
-    int second_half = n - first_half;
-
-    string first_right = first_bin.substr(0, second_half);
-    string first_left = first_bin.substr(second_half, first_half);
-
-    string second_right = second_bin.substr(0, second_half);
-    string second_left = second_bin.substr(second_half, first_half);
-
-    LargeInteger P1 = BinaryMultiply(first_left, second_left);
-    LargeInteger P2 = BinaryMultiply(first_right, second_right);
-    LargeInteger P3 = BinaryMultiply(BinaryAdd(first_left, first_right), BinaryAdd(second_left, second_right));
-
-    LargeInteger power = pow(2, second_half);
-
-    LargeInteger result = P1 * pow(power, 2) + (P3 - P1 - P2) * power + P2;
-    return result;
-}
-
-LargeInteger fastMultiply(LargeInteger first, LargeInteger second)
-{
-    if (first.isNull() || second.isNull())
-        return LargeInteger();
-
-    if (first.isNegative() && second.isNegative())
-    {
-        return first.abs() * second.abs();
-    }
-
-    if (first.isNegative())
-    {
-        LargeInteger result = first.abs() * second;
-        return result.negative();
-    }
-
-    if (second.isNegative())
-    {
-        LargeInteger result = first * second.abs();
-        return result.negative();
-    }
-
-    // ------------- MARK: Karatsuba Algorithm ----------------
-    string first_bin = first.binary();
-    string second_bin = second.binary();
-
-    return BinaryMultiply(first_bin, second_bin);
-}
-
+// multiplication with modulo
 LargeInteger multiply(LargeInteger first, LargeInteger second, LargeInteger mod)
 {
     string binary = second.binary();
-    LargeInteger two(2);
 
     LargeInteger result = (binary.at(0) == '1') ? first : 0;
 
     for (int i = 1; i < binary.size(); i++)
     {
-        first = two * first % mod;
+        first = constant::two * first % mod;
 
         if (binary.at(i) == '1')
         {
