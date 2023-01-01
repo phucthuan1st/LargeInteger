@@ -1,4 +1,5 @@
 #pragma once
+#define f(A, B, x) (A - B * x)
 #include <iostream>
 #include <fstream>
 #include <vector>

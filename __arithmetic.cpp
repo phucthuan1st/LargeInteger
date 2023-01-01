@@ -278,7 +278,6 @@ LargeInteger operator*(LargeInteger first, LargeInteger second)
 
 LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
 {
-
     if (divisor == constant::zero)
     {
         throw("Division by zero");
@@ -338,23 +337,35 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
         }
 
         // multiplying and subtracting
-        LargeInteger quotient = constant::one;
-        LargeInteger save = quotient * divisor;
+        LargeInteger a = constant::one;
+        LargeInteger b(10);
+        LargeInteger c(0);
 
-        while (save <= dv)
+        LargeInteger fc(0);
+
+        while (true)
         {
-            quotient = quotient + constant::one;
-            save = quotient * divisor;
-        }
+            c = (a + b).divide_by_2();
 
-        quotient = quotient - constant::one;
-        save = quotient * divisor;
-        dv = dv - save;
+            fc = f(dv, divisor, c);
+            if (constant::zero <= fc && fc <= divisor - 1)
+            {
+                break;
+            }
 
-        for (auto &digit : quotient.digits)
-        {
-            result.digits.insert(result.digits.begin(), digit);
+            if (fc > divisor)
+            {
+                a = a + constant::one;
+            }
+
+            if (fc < constant::zero)
+            {
+                b = b - constant::one;
+            }
         }
+        dv = fc;
+
+        result.digits.insert(result.digits.begin(), c.digits.at(0));
 
         if (dv == 0)
         {
@@ -419,18 +430,33 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
         }
 
         // multiplying and subtracting
-        LargeInteger quotient = constant::one;
-        LargeInteger save = quotient * divisor;
+        LargeInteger a = constant::one;
+        LargeInteger b(10);
+        LargeInteger c(0);
 
-        while (save <= dv)
+        LargeInteger fc(0);
+
+        while (true)
         {
-            quotient = quotient + constant::one;
-            save = quotient * divisor;
-        }
+            c = (a + b).divide_by_2();
 
-        quotient = quotient - constant::one;
-        save = quotient * divisor;
-        dv = dv - save;
+            fc = f(dv, divisor, c);
+            if (constant::zero <= fc && fc <= divisor - 1)
+            {
+                break;
+            }
+
+            if (fc > divisor)
+            {
+                a = a + constant::one;
+            }
+
+            if (fc < constant::zero)
+            {
+                b = b - constant::one;
+            }
+        }
+        dv = fc;
     }
 
     return dv;

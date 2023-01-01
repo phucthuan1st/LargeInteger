@@ -174,20 +174,25 @@ LargeInteger LargeInteger::divide_by_2()
         string num_str = this->to_str();
         int n = num_str.length();
         int carry = 0;
-        int step = 15;
+        int step = 18;
 
         for (int i = 0; i < n; i += step)
         {
-            string chunk = to_string(carry) + num_str.substr(i, 15);
+            string chunk = to_string(carry) + num_str.substr(i, step);
+
             long long num = stoll(chunk);
             long long temp = num / 2;
-            int carry = num & 1;
+            carry = num & 1;
 
-            resultStr = resultStr + to_string(temp);
+            string nonZeroDigits = to_string(temp);
+            string zeroDigits(chunk.size() - nonZeroDigits.size() - 1, '0');
+            resultStr = resultStr + zeroDigits + nonZeroDigits;
         }
 
         result = LargeInteger(resultStr);
     }
+
+    result.cleanup();
 
     return result;
 }
@@ -214,11 +219,7 @@ LargeInteger LargeInteger::divide_by_10()
 
 int LargeInteger::last_digit()
 {
-    string digits = this->to_str();
-
-    int last_digit = digits.at(digits.size() - 1) - ZERO;
-
-    return last_digit;
+    return int(this->digits.at(0)) - ZERO;
 }
 
 // using little Fermat to check if n is Prime number method with k tries
