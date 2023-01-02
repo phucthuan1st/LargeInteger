@@ -207,6 +207,9 @@ LargeInteger operator*(LargeInteger first, LargeInteger second)
         result.digits.at(i) = char(v[i] + ZERO);
     }
 
+    for (int i = n - 1; i>= 1 && !v[i]; i--) 
+        result.digits.pop_back();
+
     result.cleanup();
 
     return result;
@@ -214,23 +217,9 @@ LargeInteger operator*(LargeInteger first, LargeInteger second)
 
 LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
 {
+    
     if (dividend.isNull() || divisor.isNull()) {
         return LargeInteger();
-    }
-
-    if (divisor == constant::zero)
-    {
-        throw("Division by zero");
-    }
-
-    if (divisor > dividend)
-    {
-        return constant::zero;
-    }
-
-    if (dividend == divisor)
-    {
-        return constant::one;
     }
 
     if (dividend.isNegative() && divisor.isNegative())
@@ -250,12 +239,36 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
         return result.negative();
     }
 
-    int i, logcat = 0, qt;
     int n = dividend.digitNum(), m = divisor.digitNum();
+    if (dividend.at(n - 1) < 0 || dividend.at(n - 1) > 9) {
+        dividend.digits.pop_back();
+    }
+
+    if (divisor.at(m - 1) < 0 || divisor.at(m - 1) > 9) {
+        divisor.digits.pop_back();
+    }
+
+    if (divisor == constant::zero)
+    {
+        throw("Division by zero");
+    }
+
+    if (divisor > dividend)
+    {
+        return constant::zero;
+    }
+
+    if (dividend == divisor)
+    {
+        return constant::one;
+    }
+
+    int i, logcat = 0, qt;
+    n = dividend.digitNum();
     vector<int> cat(n, 0);
     LargeInteger t(0);
 
-    for (i = n - 1; t * 10 + dividend.at(i) < divisor; i--) {
+    for (i = n - 1; i >= 0 && t * 10 + dividend.at(i) < divisor; i--) {
         t = t * 10;
         t = t + dividend.at(i);
     }
@@ -283,6 +296,7 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
         }
 
         t = t - qt * divisor;
+        t.cleanup();
         cat.at(logcat++) = qt;
 
         i--;
@@ -314,6 +328,16 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
         return result;
     }
 
+    // Eliminate non-digit 
+    int n = dividend.digitNum(), m = divisor.digitNum();
+    if (dividend.at(n - 1) < 0 || dividend.at(n - 1) > 9) {
+        dividend.digits.pop_back();
+    }
+
+    if (divisor.at(m - 1) < 0 || divisor.at(m - 1) > 9) {
+        divisor.digits.pop_back();
+    }
+
     if (divisor == constant::zero)
     {
         throw("Division by zero");
@@ -330,7 +354,9 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
     }
 
     int i, logcat = 0, qt;
-    int n = dividend.digitNum(), m = divisor.digitNum();
+
+    n = dividend.digitNum();
+
     vector<int> cat(n, 0);
     LargeInteger t(0);
 
@@ -340,7 +366,7 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
     }
 
     while (i >= 0) {
-        t = t.multiply_pow_10(1) + dividend.at(i);
+        t = t * 10 + dividend.at(i);
         int low = 1, high = 10;
 
         while (true) {
@@ -362,6 +388,7 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
         }
 
         t = t - qt * divisor;
+        t.cleanup();
         cat.at(logcat++) = qt;
 
         i--;
@@ -468,11 +495,11 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
 
     for (int i = 1; i < bitset.size(); i++)
     {
-        base = modularMultiply(base, base, mod);
+        base = base * base % mod;
 
         if (bitset.at(i) == '1')
         {
-            result = modularMultiply(base, result, mod);
+            result = result * base % mod;
         }
     }
 
@@ -482,7 +509,6 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
 // multiplication with modulo (Russian Peasant)
 LargeInteger modularMultiply(LargeInteger first, LargeInteger second, LargeInteger mod)
 {
-    cout << "DEBUG: first = " << first << ", second = " << second << ", mod = " << mod << endl;
     LargeInteger result(0);
 
     while (second > 0) {

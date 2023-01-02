@@ -3,9 +3,17 @@
 
 void LargeInteger::cleanup()
 {
-    while (this->digitNum() > 1 && this->digits[this->digits.size() - 1] == '0')
+    while (true)
     {
-        this->digits.pop_back();
+        bool contained_digit = (this->digitNum() > 1);
+        bool diff_from_digit = (this->digits[this->digits.size() - 1] == '0');
+        
+        if (contained_digit && diff_from_digit) {
+            this->digits.pop_back();
+        }
+        else {
+            break;
+        }
     }
 }
 
