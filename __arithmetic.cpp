@@ -5,13 +5,11 @@ LargeInteger operator+(LargeInteger first, LargeInteger second)
     if (first.isNull() || second.isNull())
         return LargeInteger();
 
-    if (first == 0)
-    {
+    if (first == 0) {
         return second;
     }
 
-    if (second == 0)
-    {
+    if (second == 0) {
         return first;
     }
 
@@ -34,36 +32,34 @@ LargeInteger operator+(LargeInteger first, LargeInteger second)
         return first - second.abs();
     }
 
-    int n = second.digitNum();
-    int m = first.digitNum();
+    int n = first.digitNum();
+    int m = second.digitNum();
 
-    int minNum = min(m, n);
-    int maxNum = max(m, n);
+    if (m > n) {
+        for (int i = 0; i < m - n; i++) {
+            first.digits.push_back(ZERO);
+        }
+    }
+    n = first.digitNum();
+    result.digits = vector<char>(n, '0');
 
-    int save = 0;
+    int t = 0, s;
 
-    for (int i = 0; i < minNum; i++)
-    {
-        int temp = (first.digits[i] - ZERO) + (second.digits[i] - ZERO) + save;
+    for (int i = 0; i < n; i++) {
+        if (i < m) 
+            s = first.at(i) + second.at(i) + t;
+        else 
+            s = first.at(i) + t;
 
-        result.digits.push_back(temp % 10 + ZERO);
-        temp /= 10;
-        save = temp % 10;
+        t = s / 10;
+        result.digits[i] = char((s % 10) + ZERO);
     }
 
-    vector<char> bigger = (m > n) ? first.digits : second.digits;
-
-    for (int i = minNum; i < maxNum; i++)
-    {
-        int temp = (bigger[i] - ZERO) + save;
-
-        result.digits.push_back(temp % 10 + ZERO);
-        temp /= 10;
-        save = temp % 10;
+    if (t > 0) {
+        result.digits.push_back(t);
     }
 
-    if (save == 1)
-        result.digits.push_back('1');
+    result.cleanup();
 
     return result;
 }
@@ -120,48 +116,25 @@ LargeInteger operator-(LargeInteger first, LargeInteger second)
         return result.negative();
     }
 
-    int n = second.digitNum();
-    int m = first.digitNum();
+    int m = second.digitNum();
+    int n = first.digitNum();
 
-    int minNum = min(m, n);
-    int maxNum = max(m, n);
-
-    int save = 0;
-
-    for (int i = 0; i < minNum; i++)
-    {
-        int temp = (first.digits[i]) - (second.digits[i]) - save;
-
-        if (temp < 0)
-        {
-            temp = temp + 10;
-            save = 1;
-        }
+    int t = 0, s;
+    result.digits = vector<char>(n, ZERO);
+    for (int i = 0; i < n; i++) {
+        if (i < m) 
+            s = first.at(i) - second.at(i) + t;
         else
-        {
-            save = 0;
+            s = first.at(i) + t;
+
+        if (s < 0) {
+            s += 10;
+            t = -1;
         }
-
-        result.digits.push_back(temp + ZERO);
-    }
-
-    vector<char> bigger = (m > n) ? first.digits : second.digits;
-
-    for (int i = minNum; i < m; i++)
-    {
-        int temp = (bigger[i] - ZERO) - save;
-
-        if (temp < 0)
-        {
-            temp = temp + 10;
-            save = 1;
+        else {
+            t = 0;
         }
-        else
-        {
-            save = 0;
-        }
-
-        result.digits.push_back(temp + ZERO);
+        result.digits.at(i) = char(s + ZERO);
     }
 
     result.cleanup();
@@ -176,7 +149,7 @@ LargeInteger operator*(LargeInteger first, LargeInteger second)
         return LargeInteger();
     if (first == 0 || second == 0)
     {
-        return LargeInteger(0);
+        return constant::zero;
     }
 
     if (first == 1)
@@ -216,68 +189,35 @@ LargeInteger operator*(LargeInteger first, LargeInteger second)
     }
 
     int n = f + s;
-
-    vector<int> result(n, 0);
-
-    int i_n1 = 0;
-    int i_n2 = 0;
-
-    // Go from right to left in first
-    for (int i = 0; i <= f - 1; i++)
-    {
-        int carry = 0;
-        int n1 = first.digits[i] - ZERO;
-
-        // To shift position to left after every multiplication of a digit in second number
-        i_n2 = 0;
-
-        // Go from right to left in second
-        for (int j = 0; j <= s - 1; j++)
-        {
-            // Take current digit of second number
-            int n2 = second.digits[j] - ZERO;
-
-            // Multiply with current digit of first number
-            // and add result to previously stored result
-            // at current position.
-            int sum = n1 * n2 + result[i_n1 + i_n2] + carry;
-
-            // Carry for next iteration
-            carry = sum / 10;
-
-            // Store result
-            result[i_n1 + i_n2] = sum % 10;
-
-            i_n2++;
+    vector<int> v(n, 0);
+    
+    for (int i = 0; i < f; i++) {
+        for (int j = 0; j < s; j++) {
+            v.at(i + j) += first.at(i) * second.at(j);
         }
-
-        // store carry in next cell
-        if (carry > 0)
-            result[i_n1 + i_n2] += carry;
-
-        // To shift position to left after every
-        // multiplication of a digit in num1.
-        i_n1++;
     }
 
-    int i = result.size() - 1;
-    while (i >= 0 && result[i] == '0')
-        i--;
-
-    string str = "";
-    while (i >= 0)
-    {
-        str = str + to_string(result[i--]);
+    LargeInteger result;
+    result.digits = vector<char>(v.size(), ZERO);
+    int t = 0, save;
+    for (int i = 0; i < n; i++) {
+        save = t + v[i];
+        v[i] = save % 10;
+        t = save / 10;
+        result.digits.at(i) = char(v[i] + ZERO);
     }
 
-    LargeInteger res(str);
-    res.cleanup();
+    result.cleanup();
 
-    return res;
+    return result;
 }
 
 LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
 {
+    if (dividend.isNull() || divisor.isNull()) {
+        return LargeInteger();
+    }
+
     if (divisor == constant::zero)
     {
         throw("Division by zero");
@@ -310,68 +250,51 @@ LargeInteger operator/(LargeInteger dividend, LargeInteger divisor)
         return result.negative();
     }
 
-    int digit_pos = dividend.digitNum() - 1;
-    LargeInteger result;
+    int i, logcat = 0, qt;
+    int n = dividend.digitNum(), m = divisor.digitNum();
+    vector<int> cat(n, 0);
+    LargeInteger t(0);
 
-    // temporary/sub dividend
-    LargeInteger dv;
+    for (i = n - 1; t * 10 + dividend.at(i) < divisor; i--) {
+        t = t * 10;
+        t = t + dividend.at(i);
+    }
 
-    while (digit_pos >= 0)
-    {
-        // get as much as posible digit for sub-dividsend
-        while (digit_pos >= 0 && (dv.isNull() || dv < divisor))
-        {
-            dv.digits.insert(dv.digits.begin(), dividend.digits[digit_pos--]);
+    while (i >= 0) {
+        t = t.multiply_pow_10(1) + dividend.at(i);
+        int low = 1, high = 10;
 
-            if (dv < divisor)
-            {
-                result.digits.insert(result.digits.begin(), '0');
-            }
-        }
+        while (true) {
+            int mid = (low + high) / 2;
 
-        dv.cleanup();
-        if (dv < divisor)
-        {
-            result.cleanup();
-            return result;
-        }
-
-        // multiplying and subtracting
-        LargeInteger a = constant::one;
-        LargeInteger b(10);
-        LargeInteger c(0);
-
-        LargeInteger fc(0);
-
-        while (true)
-        {
-            c = (a + b).divide_by_2();
-
-            fc = f(dv, divisor, c);
-            if (constant::zero <= fc && fc <= divisor - 1)
-            {
+            LargeInteger fmid = f(t, divisor, mid);
+            if (constant::zero <= fmid && fmid < divisor) {
+                qt = mid;
                 break;
             }
 
-            if (fc > divisor)
-            {
-                a = a + constant::one;
+            if (fmid < constant::zero) {
+                high = high - 1;
             }
 
-            if (fc < constant::zero)
-            {
-                b = b - constant::one;
+            if (fmid >= divisor) {
+                low = low + 1;
             }
         }
-        dv = fc;
 
-        result.digits.insert(result.digits.begin(), c.digits.at(0));
+        t = t - qt * divisor;
+        cat.at(logcat++) = qt;
 
-        if (dv == 0)
-        {
-            dv.digits = {};
-        }
+        i--;
     }
+
+    LargeInteger result;
+    result.digits = vector<char>(cat.size(), ZERO);
+    for (i = 0; i < logcat; i++) {
+        result.digits.at(i) = char(cat.at(logcat - i - 1) + ZERO);
+    }
+
+    result.digits.resize(logcat);
 
     result.cleanup();
     return result;
@@ -406,60 +329,45 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
         return constant::zero;
     }
 
-    int digit_pos = dividend.digitNum() - 1;
+    int i, logcat = 0, qt;
+    int n = dividend.digitNum(), m = divisor.digitNum();
+    vector<int> cat(n, 0);
+    LargeInteger t(0);
 
-    // temporary/sub dividend
-    LargeInteger dv;
+    for (i = n - 1; t * 10 + dividend.at(i) < divisor; i--) {
+        t = t * 10;
+        t = t + dividend.at(i);
+    }
 
-    while (digit_pos >= 0)
-    {
-        // get as much as posible digit for sub-dividsend
-        if (dv == 0)
-        {
-            dv.digits = {};
-        }
-        while (digit_pos >= 0 && (dv.isNull() || dv < divisor))
-        {
-            dv.digits.insert(dv.digits.begin(), dividend.digits[digit_pos--]);
-        }
-        dv.cleanup();
+    while (i >= 0) {
+        t = t.multiply_pow_10(1) + dividend.at(i);
+        int low = 1, high = 10;
 
-        if (dv < divisor)
-        {
-            return dv;
-        }
+        while (true) {
+            int mid = (low + high) / 2;
 
-        // multiplying and subtracting
-        LargeInteger a = constant::one;
-        LargeInteger b(10);
-        LargeInteger c(0);
-
-        LargeInteger fc(0);
-
-        while (true)
-        {
-            c = (a + b).divide_by_2();
-
-            fc = f(dv, divisor, c);
-            if (constant::zero <= fc && fc <= divisor - 1)
-            {
+            LargeInteger fmid = f(t, divisor, mid);
+            if (constant::zero <= fmid && fmid < divisor) {
+                qt = mid;
                 break;
             }
 
-            if (fc > divisor)
-            {
-                a = a + constant::one;
+            if (fmid < constant::zero) {
+                high = high - 1;
             }
 
-            if (fc < constant::zero)
-            {
-                b = b - constant::one;
+            if (fmid >= divisor) {
+                low = low + 1;
             }
         }
-        dv = fc;
+
+        t = t - qt * divisor;
+        cat.at(logcat++) = qt;
+
+        i--;
     }
 
-    return dv;
+    return t;
 }
 
 LargeInteger operator+(LargeInteger first, unsigned long long second)
@@ -515,6 +423,7 @@ LargeInteger operator%(unsigned long long first, LargeInteger second)
 LargeInteger pow(LargeInteger base, LargeInteger expo)
 {
     LargeInteger result(constant::one);
+
     if (expo == constant::zero)
     {
         return result;
@@ -559,49 +468,13 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
 
     for (int i = 1; i < bitset.size(); i++)
     {
-        base = base * base % mod;
+        base = modularMultiply(base, base, mod);
 
         if (bitset.at(i) == '1')
         {
-            result = result * base % mod;
+            result = modularMultiply(base, result, mod);
         }
     }
-
-    return result;
-}
-
-string BinaryAdd(string first, string second)
-{
-    while (first.length() < second.length())
-    {
-        first.append("0");
-    }
-
-    while (first.length() > second.length())
-    {
-        second.append("0");
-    }
-
-    string result;
-    int n = first.length();
-    int carry = 0;
-
-    for (int i = 0; i < n; i++)
-    {
-        int firstBit = first[i] - ZERO;
-        int secondBit = second[i] - ZERO;
-
-        // sum by using xor
-        int sum = (firstBit ^ secondBit ^ carry);
-
-        // cast sum to char and add to result
-        result = result + (char(ZERO + sum));
-
-        carry = (firstBit & secondBit) | (secondBit & carry) | (firstBit & carry);
-    }
-
-    if (carry)
-        result = result + '1';
 
     return result;
 }
@@ -609,37 +482,39 @@ string BinaryAdd(string first, string second)
 // multiplication with modulo (Russian Peasant)
 LargeInteger modularMultiply(LargeInteger first, LargeInteger second, LargeInteger mod)
 {
-    string binary = second.binary();
+    cout << "DEBUG: first = " << first << ", second = " << second << ", mod = " << mod << endl;
+    LargeInteger result(0);
 
-    LargeInteger result = (binary.at(0) == '1') ? first : 0;
-
-    for (int i = 1; i < binary.size(); i++)
-    {
-        first = constant::two * first % mod;
-
-        if (binary.at(i) == '1')
-        {
-            result = (result + first) % mod;
+    while (second > 0) {
+        if (second.at(0) & 1) {
+            result = (result + first) % mod; 
         }
+
+        first = first * constant::two;
+        second = second.divide_by_2();
     }
 
     return result;
 }
 
-LargeInteger bin2dec(string bitset)
-{
-    LargeInteger result(0);
-    LargeInteger base(1);
+LargeInteger sqrt(LargeInteger x) {
+    LargeInteger left(1), right(x), mid(0);
+    LargeInteger v(1), prod;
 
-    for (int i = bitset.length() - 1; i >= 0; i--)
-    {
-        if (bitset.at(i) == '1')
-        {
-            result = result + base;
+    while (left < right) {
+        mid = (left + right).divide_by_2();
+        
+        prod = mid * mid;
+        if (prod <= x) {
+            v = mid;
+            mid = mid + 1;
+            left = mid;
         }
-
-        base = base * constant::two;
+        else {
+            mid = mid - 1;
+            right = mid;
+        }
     }
 
-    return result;
+    return v;
 }

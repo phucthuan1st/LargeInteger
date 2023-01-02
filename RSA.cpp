@@ -117,10 +117,16 @@
 //         while (checkPrimeFermat(p) == 0)
 //         {
 //             p = p + 2;
+//             cout << "--------------" << endl;
+//             cout << "p = " << p << endl;
+//             cout << "--------------" << endl;
 //         }
 //         while (checkPrimeFermat(q) == 0)
 //         {
 //             q = q + 2;
+//             cout << "--------------" << endl;
+//             cout << "q = " << q << endl;
+//             cout << "--------------" << endl;
 //         }
 
 //         LargeInteger n = getN(p, q);

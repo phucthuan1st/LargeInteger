@@ -10,7 +10,7 @@ private:
     Randomizer()
     {
         seed = LargeInteger(time(0) + clock());
-        seed = constant::sub_max_LargeInt + modularMultiply(seed + constant::B, constant::A, constant::diff);
+        seed = constant::sub_max_LargeInt + ((seed + constant::B) * constant::A % constant::diff);
     }
 
     static Randomizer *instance;
@@ -19,7 +19,7 @@ public:
     LargeInteger next()
     {
         LargeInteger temp = this->seed;
-        this->seed = constant::sub_max_LargeInt + modularMultiply(seed + constant::B, constant::A, constant::diff);
+        this->seed = constant::sub_max_LargeInt + ((seed + constant::B) * constant::A % constant::diff);
         return temp;
     }
 

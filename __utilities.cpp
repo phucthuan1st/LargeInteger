@@ -191,9 +191,8 @@ LargeInteger LargeInteger::divide_by_2()
 
         result = LargeInteger(resultStr);
     }
-
+    
     result.cleanup();
-
     return result;
 }
 
@@ -233,12 +232,21 @@ bool checkPrimeFermat(LargeInteger n, int k)
         return true;
 
     LargeInteger step = pow(2, k + 1);
+
     LargeInteger min(constant::two);
+    LargeInteger max(constant::zero);
     // try k times if n if satisfied a^(n-1) congruent with n
     while (k > 0)
     {
         LargeInteger a;
-        a = Randomizer::randomizer()->next(min, n / step);
+        max = n / step;
+        cout << "-----------------------------" << endl;
+        cout << k << "th try" << endl;
+        a = Randomizer::randomizer()->next(min, max);
+
+        cout << "n = " << n << endl;
+        cout << "Step = " << step << endl;
+        cout << "a = " << a << endl;
 
         // make sure n>4
         LargeInteger _gcd = gcd(n, a);
@@ -253,14 +261,15 @@ bool checkPrimeFermat(LargeInteger n, int k)
         double time = double(end - start) / CLOCKS_PER_SEC;
 
         cout << "PowMod = " << powMod << " Finished in " << time << "seconds" << endl;
+        
         if (powMod != constant::one)
         {
             return false;
         }
 
         k = k - 1;
-        min = n / step;
         step = step.divide_by_2();
+        min = max;
     }
     return true;
 }

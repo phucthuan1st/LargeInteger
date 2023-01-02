@@ -38,7 +38,7 @@ public:
     bool isNull() { return this->digits.size() == 0; }
 
     // is Even
-    bool isEven() { return (this->digits.at(0) - ZERO) % 2 == 0; }
+    bool isEven() { return (this->at(0) & 1) == 0; }
 
     // is Negative
     bool isNegative() { return (this->digits.at(this->digits.size() - 1)) == '-'; }
@@ -55,6 +55,13 @@ public:
     LargeInteger divide_by_2();
     LargeInteger divide_by_10();
     int last_digit();
+    int at(int index) {
+        if (index < 0 || index >= this->digits.size()) {
+            throw("Index out of range");
+        }
+
+        return int(this->digits[index] - ZERO);
+    }
 
     // get binary string representation
     string binary();
@@ -112,9 +119,8 @@ LargeInteger pow(LargeInteger base, LargeInteger expo);
 LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod);
 LargeInteger modularMultiply(LargeInteger first, LargeInteger second, LargeInteger mod);
 LargeInteger gcd(LargeInteger a, LargeInteger b);
-string BinaryAdd(string first, string second);
 bool checkPrimeFermat(LargeInteger n, int k = 5);
-LargeInteger bin2dec(string bitset);
+LargeInteger sqrt(LargeInteger x);
 
 // ------------------------- FREQUENTLY USED CONSTANT --------------------------
 namespace constant
