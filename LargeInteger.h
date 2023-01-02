@@ -110,8 +110,7 @@ public:
 
 LargeInteger pow(LargeInteger base, LargeInteger expo);
 LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod);
-LargeInteger multiply(LargeInteger x, LargeInteger y);
-LargeInteger multiply(LargeInteger first, LargeInteger second, LargeInteger mod);
+LargeInteger modularMultiply(LargeInteger first, LargeInteger second, LargeInteger mod);
 LargeInteger gcd(LargeInteger a, LargeInteger b);
 string BinaryAdd(string first, string second);
 bool checkPrimeFermat(LargeInteger n, int k = 5);
@@ -121,7 +120,7 @@ LargeInteger bin2dec(string bitset);
 namespace constant
 {
     const string increment = "3407892909257402499820584612747936582059323561443721764030073546976801874298166903427690318581864860508537538281194656946439";
-    const string multiplying = "584612747936582059239337723561";
+    const string multiplying = "793658205923933705846723561";
 
     // 2^256 - 1
     const string quarter_max_LargeInt = "115792089237316195423570985008687907853269984665640564039457584007913129639935";

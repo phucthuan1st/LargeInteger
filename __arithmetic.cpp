@@ -559,11 +559,11 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod)
 
     for (int i = 1; i < bitset.size(); i++)
     {
-        base = multiply(base, base, mod);
+        base = base * base % mod;
 
         if (bitset.at(i) == '1')
         {
-            result = multiply(result, base, mod);
+            result = result * base % mod;
         }
     }
 
@@ -606,50 +606,8 @@ string BinaryAdd(string first, string second)
     return result;
 }
 
-// schonhageStrassenMultiplication
-LargeInteger multiply(LargeInteger x, LargeInteger y)
-{
-    int n = x.digitNum();
-    int m = y.digitNum();
-
-    long long linearConvolution[n + m - 1];
-    for (int i = 0; i < (n + m - 1); i++)
-        linearConvolution[i] = 0;
-
-    LargeInteger p = x;
-    for (int i = 0; i < m; i++)
-    {
-        x = p;
-        for (int j = 0; j < n; j++)
-        {
-            linearConvolution[i + j] = linearConvolution[i + j] + (long long)(y.last_digit()) * (long long)(x.last_digit());
-            x = x.divide_by_10();
-        }
-        y = y.divide_by_10();
-    }
-
-    LargeInteger product(0);
-    long long nextCarry(0);
-    LargeInteger base(1);
-
-    for (int i = 0; i < n + m - 1; i++)
-    {
-        linearConvolution[i] = linearConvolution[i] + nextCarry;
-        product = product + (base * (linearConvolution[i] % 10));
-        nextCarry = linearConvolution[i] / 10;
-        base = base.multiply_pow_10(1);
-    }
-
-    if (nextCarry == constant::one)
-    {
-        product = product + base;
-    }
-
-    return product;
-}
-
 // multiplication with modulo (Russian Peasant)
-LargeInteger multiply(LargeInteger first, LargeInteger second, LargeInteger mod)
+LargeInteger modularMultiply(LargeInteger first, LargeInteger second, LargeInteger mod)
 {
     string binary = second.binary();
 
