@@ -232,7 +232,6 @@ int LargeInteger::last_digit()
 // using little Fermat to check if n is Prime number method with k tries
 bool checkPrimeFermat(LargeInteger n, int k)
 {
-
     if (n < 1 || n == 4)
         return false;
 
@@ -279,5 +278,29 @@ bool checkPrimeFermat(LargeInteger n, int k)
         step = step.divide_by_2();
         min = max;
     }
+    return true;
+}
+
+bool isPrime(LargeInteger n) {
+    if (n < constant::two) {
+        return false;
+    }
+
+    auto start = clock();
+    // LargeInteger squareRoot = sqrt(n);
+    // cout << "Sqrt = " << squareRoot << endl;
+    LargeInteger half = n.divide_by_2() - constant::one;
+    cout << "DEBUG: HALF = " << half << endl;
+
+    for (LargeInteger i = constant::two; i < half; i = i = constant::one) {
+        cout << n << "%" << i << " = " << n % i << endl;
+        if (n % i == constant::zero) {
+            return false;
+        }
+    }
+    auto end = clock();
+    double time = (end - start) / CLOCKS_PER_SEC * 1000;
+    cout << "Check finished in " << time << "ms" << endl;
+
     return true;
 }

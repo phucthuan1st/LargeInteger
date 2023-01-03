@@ -120,6 +120,7 @@ LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod);
 LargeInteger modularMultiply(LargeInteger first, LargeInteger second, LargeInteger mod);
 LargeInteger gcd(LargeInteger a, LargeInteger b);
 bool checkPrimeFermat(LargeInteger n, int k = 5);
+bool isPrime(LargeInteger n);
 LargeInteger sqrt(LargeInteger x);
 
 // ------------------------- FREQUENTLY USED CONSTANT --------------------------

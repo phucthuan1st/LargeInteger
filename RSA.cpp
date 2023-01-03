@@ -1,8 +1,8 @@
 #include "LargeInteger.h"
 #include "Randomizer.h"
-using namespace std;
+#include "RSA.h"
 
-void modRandom(LargeInteger &p, LargeInteger &q, int size)
+void generateSecrectPair(LargeInteger &p, LargeInteger &q, int size)
 {
     if (size == 2048)
     {
@@ -33,37 +33,44 @@ void modRandom(LargeInteger &p, LargeInteger &q, int size)
         p = p * p;
         q = p * p;
     }
-}
 
-LargeInteger getN(LargeInteger &p, LargeInteger &q)
-{
-    return p * q;
-}
+    cout << "DEBUG:\np = " << p << endl << "q = " << q << endl;
 
-LargeInteger getPhi(LargeInteger &p, LargeInteger &q)
-{
-    return (p - 1) * (q - 1);
-}
-
-LargeInteger getE(LargeInteger Phi)
-{
-    for (LargeInteger e = 100; e < 1000000; e = e + 1)
-    {
-        if (gcd(e, Phi) == 1)
-        {
-            return e;
-        }
+    if (!p.isEven()) {
+        p = p + constant::one;
+    }
+    if (!q.isEven()) {
+        q = q + constant::one;
     }
 
-    return LargeInteger(0);
+    while (!isPrime(p)) {
+        p = p + constant::two;
+    }
+    while (!isPrime(q)) {
+        q = q + constant::two;
+    }
+}
+
+Key_Pair generatePublicKey(LargeInteger &p, LargeInteger &q) {
+    LargeInteger n = p * q;
+
+    LargeInteger e = pow(constant::two, n % 100);
+    LargeInteger phi = (p - constant::one) * (q - constant::one);
+
+    while (gcd(e, phi) != 1) {
+        e = e + constant::one;
+    }
+
+    auto result = make_pair(e, n);
+    return result;
 }
 
 LargeInteger gcdExtend(LargeInteger a, LargeInteger b, LargeInteger &x, LargeInteger &y)
 {
     if (b == 0)
     {
-        x = LargeInteger(1);
-        y = LargeInteger(0);
+        x = constant::one;
+        y = constant::zero;
         return a;
     }
 
@@ -75,82 +82,160 @@ LargeInteger gcdExtend(LargeInteger a, LargeInteger b, LargeInteger &x, LargeInt
     return d;
 }
 
-LargeInteger getD(LargeInteger e, LargeInteger Phi)
+LargeInteger calculatePrivateKey(LargeInteger &e, LargeInteger &phi)
 {
     LargeInteger x, y;
-    gcdExtend(e, Phi, x, y);
-    LargeInteger D = x % Phi;
+    gcdExtend(e, phi, x, y);
+    LargeInteger D = x % phi;
+
     return D;
 }
 
-void RSA_generate()
-{
-    int check = 1;
-    cout << "Select the size of the RSA key you want to generate: " << endl;
-    cout << "1. 512 bits" << endl;
-    cout << "2. 1024 bits" << endl;
-    cout << "3. 2048 bits" << endl;
-    cout << "4. Quit" << endl;
-    do
-    {
-        LargeInteger p(2386421887), q(4238399051), l;
-        int k;
-        cout << "-----------" << endl
-             << "Your choice: ";
-        cin >> check;
-
-        if (check == 1)
-            modRandom(p, q, 512);
-        else if (check == 2)
-            modRandom(p, q, 1024);
-        else if (check == 3)
-            modRandom(p, q, 2048);
-        else
-            continue;
-
-        if (p.isEven())
-            p = p + 1;
-
-        if (q.isEven())
-            q = q + 1;
-
-        while (checkPrimeFermat(p) == 0)
-        {
-            p = p + 2;
-            cout << "--------------" << endl;
-            cout << "p = " << p << endl;
-            cout << "--------------" << endl;
+LargeInteger encode(string str) {
+    string joined_str;
+    string num_part;
+    for (char &character : str) {
+        int num = int(character);
+        if (num < 100) {
+            num_part = '0' + to_string(num);
         }
-        while (checkPrimeFermat(q) == 0)
-        {
-            q = q + 2;
-            cout << "--------------" << endl;
-            cout << "q = " << q << endl;
-            cout << "--------------" << endl;
-        }
+        else 
+            num_part = to_string(num);
 
-        LargeInteger n = getN(p, q);
-        LargeInteger phi = getPhi(p, q);
-        LargeInteger e = getE(phi);
-        LargeInteger d = getD(e, phi);
+        joined_str += num_part;
+    }
 
-        cout << "p = " << p << endl;
-        cout << "q = " << q << endl;
-        cout << "n = " << n << endl;
-        cout << "phi = " << phi << endl;
-        cout << "e = " << e << endl;
-        cout << "d = " << d << endl;
-    } while (check != 4);
+    LargeInteger result(joined_str);
+    return result;
 }
 
-int main()
-{
-    auto start = clock();
-    RSA_generate();
-    auto end = clock();
+string decode(LargeInteger num) {
+    string num_str = num.to_str();
+    constexpr int chunk_size = 3;
 
-    double time = double(end - start) / CLOCKS_PER_SEC;
-    cout << "Finished in " << time << "seconds" << endl;
+    string decoded_str;
 
-    return 0;
+    for (int i = 0; i < num_str.length(); i+= chunk_size) {
+        string num_chunks = num_str.substr(i, chunk_size);
+        char ch = char(stoi(num_chunks));
+
+        decoded_str += ch;
+    }
+
+    return decoded_str;
+}
+
+LargeInteger encryptMessage(string plaintext, Key_Pair public_key) {
+    LargeInteger encoded_plaintext = encode(plaintext);
+
+    LargeInteger ciphertext = pow(encoded_plaintext, public_key.first, public_key.second);
+
+    return ciphertext;
+}
+
+string decryptMessage(LargeInteger ciphertext, Key_Pair public_key, LargeInteger private_key) {
+    LargeInteger encoded_plaintext  = pow(ciphertext, private_key, public_key.second);
+
+    string plaintext = decode(encoded_plaintext);
+    return plaintext;
+}
+
+void encryptFile(string plain_file_path, Key_Pair public_key, string encrypted_file_path) {
+    fstream plain_file(plain_file_path, ios::in);
+    fstream encrypted_file(encrypted_file_path, ios::out);
+
+    string plaintext;
+    getline(plain_file, plaintext);
+    plain_file.close();
+
+    LargeInteger ciphertext = encryptMessage(plaintext, public_key);
+    encrypted_file << ciphertext;
+    encrypted_file.close();
+}
+
+void decryptFile(string encrypted_file_path, string plain_file_path, Key_Pair public_key, LargeInteger private_key) {
+    fstream plain_file(plain_file_path, ios::in);
+    fstream encrypted_file(encrypted_file_path, ios::out);
+
+    string ciphertext;
+    getline(encrypted_file, ciphertext);
+    encrypted_file.close();
+
+    string plaintext = decryptMessage(ciphertext, public_key, private_key);
+    plain_file << plaintext;
+    plain_file.close();
+}
+
+int info() {
+    system("clear");
+    cout << "1. Encrypt a file" << endl;
+    cout << "2. Decrypt a file" << endl;
+    cout << "3. Encrypt a message" << endl;
+    cout << "4. Decrypt a ciphertext" << endl;
+    cout << "5. Change your private key" << endl;
+    cout << "0. Quit" << endl;
+    cout << "------------------" << endl;
+
+    return 5;
+}
+
+void menu() {
+    int choose;
+    string key_choose;
+    LargeInteger private_key, p(0), q(0);
+    Key_Pair public_key;
+
+    cout << "Using your private key or let system decide?[user/sys]: " << endl;
+    do {
+        cout << ">>>>>>> ";
+        cin >> key_choose;
+    } while (key_choose != "sys" && key_choose != "user");
+
+    if (key_choose == "sys") {
+        cout << "System generating..." << endl;
+        generateSecrectPair(p, q);
+        cout << "DEBUG: Your secret pair is: " << p << " --and-- " << q << endl;
+    }
+    else {
+        cout << "Enter your private secrect prime numbers p and q:" << endl;
+        do {
+            cout << "p = ";
+            cin >> p;               
+        } while (!isPrime(p));
+
+        do {
+            cout << "q = ";
+            cin >> q;               
+        } while (!isPrime(q));
+    }
+
+    public_key = generatePublicKey(p, q);
+    LargeInteger phi = (p - constant::one)*(q - constant::one);
+    private_key = calculatePrivateKey(public_key.first, phi);
+
+    do {
+        int n_choices = info();
+        do {
+            cout << ">>>>>>> ";
+            cin >> choose;
+        } while (choose > n_choices);
+
+        if (choose == 1) {
+        }
+        else if (choose == 2) {
+
+        }
+        else if (choose == 3) {
+
+        }
+        else if (choose == 4) {
+
+        }
+        else if (choose == 5) {
+
+        }
+
+    }
+    while (choose != 0);
+
 }

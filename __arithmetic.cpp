@@ -361,8 +361,7 @@ LargeInteger operator%(LargeInteger dividend, LargeInteger divisor)
     LargeInteger t(0);
 
     for (i = n - 1; t * 10 + dividend.at(i) < divisor; i--) {
-        t = t * 10;
-        t = t + dividend.at(i);
+        t = t * 10 + dividend.at(i);
     }
 
     while (i >= 0) {
