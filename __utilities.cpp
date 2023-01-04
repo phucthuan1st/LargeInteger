@@ -3,63 +3,62 @@
 
 void LargeInteger::cleanup()
 {
-    while (true)
-    {
-        bool contained_digit = (this->digitNum() > 1);
-        bool diff_from_digit = (this->digits[this->digits.size() - 1] == '0');
-        
-        if (contained_digit && diff_from_digit) {
-            this->digits.pop_back();
-        }
-        else {
-            break;
-        }
+    int n = this->digits.size();
+
+    if (n < 2) 
+        return;
+    
+    bool sign = (this->digits[n - 1] == '-');
+
+    if (sign) {
+        this->digits.pop_back();
+        n = n - 1;
+    }
+
+    while(n > 1 && this->digits[n - 1] == ZERO) {
+        this->digits.pop_back(),
+        n--;
+    }
+
+    if (sign) {
+        this->digits.push_back('-');
     }
 }
 
 void LargeInteger::parse(string &digits)
 {
-    if (digits.at(0) == '-')
+    int n = digits.size();
+    this->digits = vector<char>(n, ZERO);
+    int end = 0;
+
+    for (int i = n - 1; i >= 1; i--)
     {
-        this->digits.push_back(digits.at(0));
-        digits.erase(digits.begin());
+        if (isdigit(digits[end]))
+            this->digits[end++] = digits[i];
+        else 
+            throw("Invalid string for int: digit must be a number");
     }
 
-    for (auto &digit : digits)
-    {
-        if ((digit >= '0' && digit <= '9'))
-            this->digits.push_back(digit);
-        else
-            throw("Invalid input");
+    if (digits[0] == '-' || isdigit(digits[0])) {
+        this->digits[end] = digits[0];
     }
-
-    reverse(this->digits.begin(), this->digits.end());
+    else {
+        throw("Invalid string for int: digit must be a number");
+    }
+    cleanup();
 }
 
 string LargeInteger::to_str()
 {
-    string digits;
+    int n = this->digits.size();
+    string digits(n, '0');
+    int end = 0;
 
-    vector<char> int_digits = this->digits;
-
-    for (auto &digit : this->digits)
-    {
-        digits += digit;
+    for (int i = n - 1; i >= 0; i--) {
+        digits[i] = this->digits[end++];
     }
-
-    reverse(digits.begin(), digits.end());
 
     return digits;
-}
-
-LargeInteger LargeInteger::multiply_pow_10(unsigned long long n)
-{
-    for (unsigned int i = 0; i < n; i++)
-    {
-        this->digits.insert(this->digits.begin(), '0');
-    }
-
-    return *this;
 }
 
 LargeInteger LargeInteger::abs()
@@ -109,8 +108,8 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
 
     while (a.isEven() && b.isEven())
     {
-        a = a.divide_by_2();
-        b = b.divide_by_2();
+        a = a / 2;
+        b = b / 2;
         g = g * constant::two;
     }
 
@@ -119,16 +118,16 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
 
         while (a.isEven())
         {
-            a = a.divide_by_2();
+            a = a / 2;
         }
 
         while (b.isEven())
         {
-            b = b.divide_by_2();
+            b = b / 2;
         }
 
         LargeInteger sub = (a > b) ? (a - b) : (b - a);
-        t = sub.divide_by_2();
+        t = sub / 2;
 
         if (a >= b)
         {
@@ -147,13 +146,11 @@ LargeInteger gcd(LargeInteger a, LargeInteger b)
 
 string LargeInteger::binary()
 {
-
     string result;
     LargeInteger clone(*this);
 
     while (clone != constant::zero)
     {
-        // cout << "Clone = " << clone << endl;
         if (clone.isEven())
         {
             result.append("0");
@@ -163,70 +160,10 @@ string LargeInteger::binary()
             result.append("1");
         }
 
-        clone = clone.divide_by_2();
+        clone = clone / 2;
     }
 
     return result;
-}
-
-LargeInteger LargeInteger::divide_by_2()
-{
-    LargeInteger result;
-    if (this->isNegative())
-    {
-        result = this->abs().divide_by_2().negative();
-    }
-    else
-    {
-        string resultStr = "";
-        string num_str = this->to_str();
-        int n = num_str.length();
-        int carry = 0;
-        int step = 18;
-
-        for (int i = 0; i < n; i += step)
-        {
-            string chunk = to_string(carry) + num_str.substr(i, step);
-
-            long long num = stoll(chunk);
-            long long temp = num / 2;
-            carry = num & 1;
-
-            string nonZeroDigits = to_string(temp);
-            string zeroDigits(chunk.size() - nonZeroDigits.size() - 1, '0');
-            resultStr = resultStr + zeroDigits + nonZeroDigits;
-        }
-
-        result = LargeInteger(resultStr);
-    }
-    
-    result.cleanup();
-    return result;
-}
-
-LargeInteger LargeInteger::divide_by_10()
-{
-    if (*this == constant::zero)
-    {
-        return constant::zero;
-    }
-
-    if (this->isNegative())
-    {
-        return this->abs().divide_by_10().negative();
-    }
-
-    string digits = this->to_str();
-    if (digits.length() > 1)
-    {
-        digits.pop_back();
-    }
-    return LargeInteger(digits);
-}
-
-int LargeInteger::last_digit()
-{
-    return int(this->digits.at(0)) - ZERO;
 }
 
 // using little Fermat to check if n is Prime number method with k tries
@@ -275,7 +212,7 @@ bool checkPrimeFermat(LargeInteger n, int k)
         }
 
         k = k - 1;
-        step = step.divide_by_2();
+        step = step / 2;
         min = max;
     }
     return true;
@@ -287,13 +224,14 @@ bool isPrime(LargeInteger n) {
     }
 
     auto start = clock();
-    // LargeInteger squareRoot = sqrt(n);
+    LargeInteger squareRoot = sqrt(n);
     // cout << "Sqrt = " << squareRoot << endl;
-    LargeInteger half = n.divide_by_2() - constant::one;
-    cout << "DEBUG: HALF = " << half << endl;
+    // LargeInteger half = n / 2 - constant::one;
+    // cout << "DEBUG: HALF = " << half << endl;
 
-    for (LargeInteger i = constant::two; i < half; i = i = constant::one) {
+    for (LargeInteger i = constant::two; i < squareRoot; i = i + constant::one) {
         cout << n << "%" << i << " = " << n % i << endl;
+        
         if (n % i == constant::zero) {
             return false;
         }

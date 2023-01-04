@@ -14,42 +14,38 @@ LargeInteger::LargeInteger(long long value)
     else
     {
         string digits = to_string(value);
+        int n = digits.length();
+        this->digits = vector<char>(n, ZERO);
+        int end = 0;
 
-        if (digits.at(0) == '-')
+        for (int i = n - 1; i >= 0; i--)
         {
-            this->digits.push_back(digits.at(0));
-            digits.erase(digits.begin());
+            this->digits[end++] = digits[i];
         }
-
-        for (auto &digit : digits)
-        {
-            if ((digit >= '0' && digit <= '9'))
-                this->digits.push_back(digit);
-            else
-                throw("Invalid input");
-        }
-
-        reverse(this->digits.begin(), this->digits.end());
     }
 }
 
 LargeInteger::LargeInteger(string digits)
 {
-    if (digits.at(0) == '-')
+    int n = digits.size();
+    this->digits = vector<char>(n, ZERO);
+    int end = 0;
+
+    for (int i = n - 1; i >= 1; i--)
     {
-        this->digits.push_back(digits.at(0));
-        digits.erase(digits.begin());
+        if (isdigit(digits[i]))
+            this->digits[end++] = digits[i];
+        else 
+            throw("Invalid string for int: digit must be a number");
     }
 
-    for (auto &digit : digits)
-    {
-        if ((digit >= '0' && digit <= '9'))
-            this->digits.push_back(digit);
-        else
-            throw("Invalid input");
+    if (digits[0] == '-' || isdigit(digits[0])) {
+        this->digits[end] = digits[0];
     }
-
-    reverse(this->digits.begin(), this->digits.end());
+    else {
+        throw("Invalid string for int: digit must be a number");
+    }
+    cleanup();
 }
 
 LargeInteger::LargeInteger(const LargeInteger &other)

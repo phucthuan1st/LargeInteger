@@ -25,7 +25,7 @@ void generateSecrectPair(LargeInteger &p, LargeInteger &q, int size)
             upper_limit = constant::halfMaxLargeInt;
         }
 
-        LargeInteger lower_limit = upper_limit.divide_by_2();
+        LargeInteger lower_limit = upper_limit / 2;
 
         p = Randomizer::randomizer()->next(lower_limit, upper_limit);
         q = Randomizer::randomizer()->next(lower_limit, upper_limit);
@@ -36,18 +36,22 @@ void generateSecrectPair(LargeInteger &p, LargeInteger &q, int size)
 
     cout << "DEBUG:\np = " << p << endl << "q = " << q << endl;
 
-    if (!p.isEven()) {
+    if (p.isEven()) {
         p = p + constant::one;
     }
-    if (!q.isEven()) {
+    if (q.isEven()) {
         q = q + constant::one;
     }
 
-    while (!isPrime(p)) {
+    cout << "DEBUG:\np = " << p << endl << "q = " << q << endl;
+
+    while (!checkPrimeFermat(p)) {
         p = p + constant::two;
+        cout << "DEBUG: p = " << p << endl;
     }
-    while (!isPrime(q)) {
+    while (!checkPrimeFermat(q)) {
         q = q + constant::two;
+        cout << "DEBUG: q = " << q << endl;
     }
 }
 

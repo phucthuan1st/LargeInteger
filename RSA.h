@@ -1,3 +1,4 @@
+#pragma once
 #include "LargeInteger.h"
 #include "Randomizer.h"
 #include <utility>
@@ -29,5 +30,11 @@ void encryptFile(string plain_file_path, Key_Pair public_key, string encrypted_f
 
 // decrypt a file
 void decryptFile(string encrypted_file_path, string plain_file_path, Key_Pair public_key, LargeInteger private_key);
+
+// check Prime using Fermat theory
+bool checkPrimeFermat(LargeInteger n, int k = 5);
+
+// bruteforce check prime
+bool isPrime(LargeInteger n);
 
 void menu();

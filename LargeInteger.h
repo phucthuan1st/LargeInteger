@@ -1,10 +1,11 @@
 #pragma once
-#define f(A, B, x) (A - B * x)
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
 #include <algorithm>
+
+#define f(A, B, x) (A - B * x)
 
 // order of '0'
 #define ZERO 48
@@ -18,13 +19,15 @@ private:
     void cleanup();
 
 public:
+    //---------------------- INITIALIZE ----------------------//
     LargeInteger();
     LargeInteger(long long);
     LargeInteger(const LargeInteger &other);
-    LargeInteger(string);
+    LargeInteger(string digits);
     LargeInteger &operator=(LargeInteger other);
 
     //---------------------- UTILITIES ----------------------//
+
     // parse a string to large integer
     void parse(string &);
 
@@ -32,7 +35,14 @@ public:
     string to_str();
 
     // get number of digit of your number
-    int digitNum() { return this->digits.size(); }
+    int digitNum() { 
+        if (isdigit(this->digits[this->digits.size() - 1])) {
+            return this->digits.size();
+        }
+        else {
+            return this->digits.size() - 1;
+        }
+    }
 
     // check if your number is NULL
     bool isNull() { return this->digits.size() == 0; }
@@ -43,18 +53,15 @@ public:
     // is Negative
     bool isNegative() { return (this->digits.at(this->digits.size() - 1)) == '-'; }
 
-    // multiply your number by 10^n
-    LargeInteger multiply_pow_10(unsigned long long n);
-
     // get abs of the number
     LargeInteger abs();
 
     // get negative form of the number
     LargeInteger negative();
 
-    LargeInteger divide_by_2();
-    LargeInteger divide_by_10();
-    int last_digit();
+    int last_digit() {return int(this->digits.at(0)) - ZERO; };
+    
+    // get digits at index, throw message if index exceed size of the number
     int at(int index) {
         if (index < 0 || index >= this->digits.size()) {
             throw("Index out of range");
@@ -113,20 +120,25 @@ public:
     friend LargeInteger operator*(unsigned long long first, LargeInteger second);
     friend LargeInteger operator/(unsigned long long dividend, LargeInteger divisor);
     friend LargeInteger operator%(unsigned long long dividend, LargeInteger divisor);
+
+    // fast divide by 10
+    LargeInteger divide_by_10();
+
+    // multiply your number by 10^n
+    LargeInteger multiply_pow_10(unsigned long long n);
 };
 
 LargeInteger pow(LargeInteger base, LargeInteger expo);
 LargeInteger pow(LargeInteger base, LargeInteger expo, LargeInteger mod);
-LargeInteger modularMultiply(LargeInteger first, LargeInteger second, LargeInteger mod);
 LargeInteger gcd(LargeInteger a, LargeInteger b);
-bool checkPrimeFermat(LargeInteger n, int k = 5);
-bool isPrime(LargeInteger n);
 LargeInteger sqrt(LargeInteger x);
 
-// ------------------------- FREQUENTLY USED CONSTANT --------------------------
+// ------------------------- FREQUENTLY USED CONSTANT --------------------------//
 namespace constant
 {
+    // increment constant for randomizer
     const string increment = "3407892909257402499820584612747936582059323561443721764030073546976801874298166903427690318581864860508537538281194656946439";
+    // multiplying constant for randomizer
     const string multiplying = "793658205923933705846723561";
 
     // 2^256 - 1
@@ -135,6 +147,7 @@ namespace constant
     const string half_max_LargeInt = "13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095";
     // 2^1024 - 1
     const string max_LargeInt = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540827237163350510684586298239947245938479716304835356329624224137215";
+    
     // 2^1023 + 1
     const string sub_max_LargeInt = "89884656743115795386465259539451236680898848947115328636715040578866337902750481566354238661203768010560056939935696678829394884407208311246423715319737062188883946712432742638151109800623047059726541476042502884419075341171231440736956555270413618581675255342293149119973622969239858152417678164812112068609";
 

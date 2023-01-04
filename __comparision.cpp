@@ -27,15 +27,8 @@ bool operator<(LargeInteger first, LargeInteger second)
 
     while (n--)
     {
-        if (first.digits[n] > second.digits[n])
-        {
-            return false;
-        }
-
-        if (first.digits[n] < second.digits[n])
-        {
-            return true;
-        }
+        if (first.digits[n] != second.digits[n])
+            return first.digits[n] < second.digits[n];
     }
 
     return false;
@@ -68,16 +61,8 @@ bool operator>(LargeInteger first, LargeInteger second)
 
     while (n--)
     {
-
-        if (first.digits[n] < second.digits[n])
-        {
-            return false;
-        }
-
-        if (first.digits[n] > second.digits[n])
-        {
-            return true;
-        }
+        if (first.digits[n] != second.digits[n])
+            return first.digits[n] > second.digits[n];
     }
 
     return false;
