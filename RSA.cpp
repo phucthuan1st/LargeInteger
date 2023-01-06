@@ -289,6 +289,7 @@ void menu() {
             cout << ">>>>>>> ";
             cin >> choose;
         } while (choose > n_choices);
+        cin.ignore();
 
         if (choose == 1) {
             cout << "--------------- ENCRYPT YOUR FILE ---------------" << endl;
