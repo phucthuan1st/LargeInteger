@@ -208,26 +208,24 @@ string decryptMessage(LargeInteger ciphertext, Key_Pair public_key, LargeInteger
 
 void encryptFile(string plain_file_path, Key_Pair public_key, string encrypted_file_path) {
     fstream plain_file(plain_file_path, ios::in);
-    fstream encrypted_file(encrypted_file_path, ios::out);
-
     string plaintext;
     getline(plain_file, plaintext);
     plain_file.close();
 
+    fstream encrypted_file(encrypted_file_path, ios::out);
     LargeInteger ciphertext = encryptMessage(plaintext, public_key);
     encrypted_file << ciphertext;
     encrypted_file.close();
 }
 
 void decryptFile(string encrypted_file_path, string plain_file_path, Key_Pair public_key, LargeInteger private_key) {
-    fstream plain_file(plain_file_path, ios::out);
     fstream encrypted_file(encrypted_file_path, ios::in);
-
     string ciphertext;
     getline(encrypted_file, ciphertext);
     cout << ciphertext << endl;
     encrypted_file.close();
 
+    fstream plain_file(plain_file_path, ios::out);
     string plaintext = decryptMessage(ciphertext, public_key, private_key);
     plain_file << plaintext;
     plain_file.close();
@@ -331,7 +329,7 @@ void menu() {
             } while (plain_file_path.length() <= 0);
 
             try {
-                decryptFile(plain_file_path, encrypted_file_path, public_key, private_key);
+                decryptFile(encrypted_file_path, plain_file_path, public_key, private_key);
             }
             catch (const char* error) {
                 cout << "Error when decrypt: " << error << endl;
@@ -367,6 +365,7 @@ void menu() {
             cout << "Your plaintext is: " << plaintext << endl;
         }
         else if (choose == 5) {
+            cout << "--------------- SET UP NEW KEY ---------------" << endl;
             setUpNewKey(p, q, private_key, public_key);
         }
 
