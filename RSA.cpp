@@ -157,9 +157,10 @@ LargeInteger calculatePrivateKey(LargeInteger &e, LargeInteger &phi)
     return D;
 }
 
-LargeInteger encode(string str) {
-    string joined_str;
+vector<string> encode(string str) {
+    vector<string> joined_str;
     string num_part;
+
     for (char &character : str) {
         int num = int(character);
         if (num < 100) {
@@ -168,39 +169,58 @@ LargeInteger encode(string str) {
         else 
             num_part = to_string(num);
 
-        joined_str += num_part;
+        joined_str.push_back(num_part);
     }
 
-    LargeInteger result(joined_str);
-    return result;
+    return joined_str;
 }
 
-string decode(LargeInteger num) {
-    string num_str = num.to_str();
-    constexpr int chunk_size = 3;
+string decode(vector<string> encoded_plaintext) {
 
-    string decoded_str;
+    string decoded_str = "";
 
-    for (int i = 0; i < num_str.length(); i+= chunk_size) {
-        string num_chunks = num_str.substr(i, chunk_size);
-        char ch = char(stoi(num_chunks));
-
+    for (auto &each : encoded_plaintext) {
+        char ch = char(stoi(each));
         decoded_str += ch;
     }
 
     return decoded_str;
 }
 
-LargeInteger encryptMessage(string plaintext, Key_Pair public_key) {
-    LargeInteger encoded_plaintext = encode(plaintext);
+string encryptMessage(string plaintext, Key_Pair public_key) {
+    vector<string> encoded_plaintext = encode(plaintext);
+    string ciphertext = "";
 
-    LargeInteger ciphertext = pow(encoded_plaintext, public_key.first, public_key.second);
+    LargeInteger character;
+
+    for (auto &each : encoded_plaintext) {
+        character.parse(each);
+        ciphertext += pow(character, public_key.first, public_key.second).to_str() + ' ';
+    }
 
     return ciphertext;
 }
 
-string decryptMessage(LargeInteger ciphertext, Key_Pair public_key, LargeInteger private_key) {
-    LargeInteger encoded_plaintext  = pow(ciphertext, private_key, public_key.second);
+string decryptMessage(string ciphertext, Key_Pair public_key, LargeInteger private_key) {
+    vector<string> encoded_plaintext;
+    
+    string token;
+
+    for (int i = 0; i < ciphertext.length(); i++) {
+        if (ciphertext[i] != ' ') {
+            token += ciphertext[i];
+        }
+        else {
+            LargeInteger num = pow(token, private_key, public_key.second);
+            encoded_plaintext.push_back(num.to_str());
+            token = "";
+        }
+
+        if (i == ciphertext.length() - 1 && ciphertext[i] != ' ') {
+            LargeInteger num = pow(token, private_key, public_key.second);
+            encoded_plaintext.push_back(num.to_str());
+        }
+    }
 
     string plaintext = decode(encoded_plaintext);
     return plaintext;
@@ -213,7 +233,7 @@ void encryptFile(string plain_file_path, Key_Pair public_key, string encrypted_f
     plain_file.close();
 
     fstream encrypted_file(encrypted_file_path, ios::out);
-    LargeInteger ciphertext = encryptMessage(plaintext, public_key);
+    string ciphertext = encryptMessage(plaintext, public_key);
     encrypted_file << ciphertext;
     encrypted_file.close();
 }
@@ -343,17 +363,30 @@ void menu() {
                 getline(cin, message);
             } while (message.length() <= 0);
 
-            LargeInteger ciphertext = encryptMessage(message, public_key);
-            cout << "Your cipher text is: " << ciphertext << endl;            
+            try {
+                string ciphertext = encryptMessage(message, public_key);
+                cout << "Your cipher text is: " << ciphertext << endl;  
+            }
+            catch (const char *error) {
+                cout << "Error occurs when try to encrypt the message" << endl;
+                cout << "Error: " << error << endl;
+            }          
         }
         else if (choose == 4) {
             cout << "--------------- DECRYPT A MESSAGE ---------------" << endl;
+            string ciphertext;
             bool isValidCipherText = false;
-            LargeInteger ciphertext;
             do {
                 try {
                     cout << "Enter a ciphertext: " << endl;
-                    cin >> ciphertext;
+                    getline(cin, ciphertext);
+
+                    for (auto &character : ciphertext) {
+                        if (!isdigit(character) && character != ' ') {
+                            throw("Invalid ciphertext");
+                        }
+                    }
+
                     isValidCipherText = true;
                 }
                 catch (const char* error) {
@@ -361,8 +394,13 @@ void menu() {
                 }
             } while (!isValidCipherText);
 
-            string plaintext = decryptMessage(ciphertext, public_key, private_key);
-            cout << "Your plaintext is: " << plaintext << endl;
+            try {
+                string plaintext = decryptMessage(ciphertext, public_key, private_key);
+                cout << "Your plaintext is: " << plaintext << endl;
+            }
+            catch (const char* error) {
+                cout << "Error occurs when try to decrypt the message: " << error << endl;
+            }
         }
         else if (choose == 5) {
             cout << "--------------- SET UP NEW KEY ---------------" << endl;
@@ -370,10 +408,8 @@ void menu() {
         }
 
         cout << "Press Enter to continue..." << endl;
-        cin.ignore();
         getchar();
 
     }
     while (choose != 0);
-
 }

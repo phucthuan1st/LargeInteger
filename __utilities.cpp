@@ -33,10 +33,14 @@ void LargeInteger::parse(string &digits)
 
     for (int i = n - 1; i >= 1; i--)
     {
-        if (isdigit(digits[end]))
+        if (isdigit(digits[end])) {
             this->digits[end++] = digits[i];
+        }
         else 
+        {
+            cout << digits[end] << " is not a number" << endl;
             throw("Invalid string for int: digit must be a number");
+        }
     }
 
     if (digits[0] == '-' || isdigit(digits[0])) {

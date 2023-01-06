@@ -20,10 +20,10 @@ LargeInteger gcdExtend(LargeInteger a, LargeInteger b, LargeInteger &x, LargeInt
 LargeInteger calculatePrivateKey(LargeInteger &e, LargeInteger &phi);
 
 // encrypt message
-LargeInteger encryptMessage(string plaintext, Key_Pair public_key);
+string encryptMessage(string plaintext, Key_Pair public_key);
 
 // decrypt message
-string decryptMessage(LargeInteger ciphertext, Key_Pair public_key, LargeInteger private_key);
+string decryptMessage(string ciphertext, Key_Pair public_key, LargeInteger private_key);
 
 // encrypt a file
 void encryptFile(string plain_file_path, Key_Pair public_key, string encrypted_file_path);
