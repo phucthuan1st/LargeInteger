@@ -220,11 +220,12 @@ void encryptFile(string plain_file_path, Key_Pair public_key, string encrypted_f
 }
 
 void decryptFile(string encrypted_file_path, string plain_file_path, Key_Pair public_key, LargeInteger private_key) {
-    fstream plain_file(plain_file_path, ios::in);
-    fstream encrypted_file(encrypted_file_path, ios::out);
+    fstream plain_file(plain_file_path, ios::out);
+    fstream encrypted_file(encrypted_file_path, ios::in);
 
     string ciphertext;
     getline(encrypted_file, ciphertext);
+    cout << ciphertext << endl;
     encrypted_file.close();
 
     string plaintext = decryptMessage(ciphertext, public_key, private_key);

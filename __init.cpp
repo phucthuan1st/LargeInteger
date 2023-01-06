@@ -43,6 +43,7 @@ LargeInteger::LargeInteger(string digits)
         this->digits[end] = digits[0];
     }
     else {
+        cout << "DEBUG: Your string is: " << digits << endl;
         throw("Invalid string for int: digit must be a number");
     }
     cleanup();
