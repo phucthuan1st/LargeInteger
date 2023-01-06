@@ -2,6 +2,72 @@
 #include "Randomizer.h"
 #include "RSA.h"
 
+// using little Fermat to check if n is Prime number method with k tries
+bool checkPrimeFermat(LargeInteger n, int k)
+{
+    if (n < 1 || n == 4)
+        return false;
+
+    if (n <= 3)
+        return true;
+
+    LargeInteger a;
+
+    for (int i = 0; i < k/4; i++) {
+        a = Randomizer::randomizer()->next(2, 100);
+        if (gcd(n, a) != constant::one) 
+            return false;
+
+        if (pow(a, n - 1, n) != constant::one) 
+            return false;
+    }
+
+    for (int i = 0; i < k/4; i++) {
+        a = Randomizer::randomizer()->next(100, n / 1024);
+        if (gcd(n, a) != constant::one) 
+            return false;
+
+        if (pow(a, n - 1, n) != constant::one) 
+            return false;
+    }
+
+    for (int i = 0; i < k/4; i++) {
+        a = Randomizer::randomizer()->next(n / 1024, n / 512);
+        if (gcd(n, a) != constant::one) 
+            return false;
+
+        if (pow(a, n - 1, n) != constant::one) 
+            return false;
+    }
+
+    for (int i = 0; i < k/4; i++) {
+        a = Randomizer::randomizer()->next(n / 512, sqrt(n));
+        if (gcd(n, a) != constant::one) 
+            return false;
+
+        if (pow(a, n - 1, n) != constant::one) 
+            return false;
+    }
+
+    return true;
+}
+
+bool isPrime(LargeInteger n) {
+    if (n < constant::two) {
+        return false;
+    }
+
+    LargeInteger squareRoot = sqrt(n);
+
+    for (LargeInteger i = constant::two; i < squareRoot; i = i + constant::one) {
+        if (n % i == constant::zero) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void generateSecrectPair(LargeInteger &p, LargeInteger &q, int size)
 {
     if (size == 2048)
@@ -34,16 +100,12 @@ void generateSecrectPair(LargeInteger &p, LargeInteger &q, int size)
         q = p * p;
     }
 
-    cout << "DEBUG:\np = " << p << endl << "q = " << q << endl;
-
     if (p.isEven()) {
         p = p + constant::one;
     }
     if (q.isEven()) {
         q = q + constant::one;
     }
-
-    cout << "DEBUG:\np = " << p << endl << "q = " << q << endl;
 
     while (!checkPrimeFermat(p)) {
         p = p + constant::two;
@@ -183,12 +245,8 @@ int info() {
     return 5;
 }
 
-void menu() {
-    int choose;
+void setUpNewKey(LargeInteger &p, LargeInteger &q, LargeInteger &private_key, Key_Pair &public_key) {
     string key_choose;
-    LargeInteger private_key, p(0), q(0);
-    Key_Pair public_key;
-
     cout << "Using your private key or let system decide?[user/sys]: " << endl;
     do {
         cout << ">>>>>>> ";
@@ -216,6 +274,14 @@ void menu() {
     public_key = generatePublicKey(p, q);
     LargeInteger phi = (p - constant::one)*(q - constant::one);
     private_key = calculatePrivateKey(public_key.first, phi);
+}
+
+void menu() {
+    int choose;
+    LargeInteger private_key, p(0), q(0);
+    Key_Pair public_key;
+
+    setUpNewKey(p, q, private_key, public_key);
 
     do {
         int n_choices = info();
@@ -225,19 +291,73 @@ void menu() {
         } while (choose > n_choices);
 
         if (choose == 1) {
+            cout << "--------------- ENCRYPT YOUR FILE ---------------" << endl;
+            string plain_file_path = "";
+            string encrypted_file_path = "";
+            do {
+                cout << "Enter path to your plaintext file: " << endl;
+                getline(cin, plain_file_path);
+            } while (plain_file_path.length() <= 0);
+
+            do {
+                cout << "Enter path (or name) to save your encrypted file: " << endl;
+                getline(cin, encrypted_file_path);
+            } while (encrypted_file_path.length() <= 0);
+
+            encryptFile(plain_file_path, public_key, encrypted_file_path);
         }
         else if (choose == 2) {
+            cout << "--------------- DECRYPT YOUR FILE ---------------" << endl;
+            string plain_file_path = "";
+            string encrypted_file_path = "";
 
+            do {
+                cout << "Enter path to your encrypted file: " << endl;
+                getline(cin, encrypted_file_path);
+            } while (encrypted_file_path.length() <= 0);
+
+            do {
+                cout << "Enter path (or name) to save your plaintext file: " << endl;
+                getline(cin, plain_file_path);
+            } while (plain_file_path.length() <= 0);
+
+            decryptFile(plain_file_path, encrypted_file_path, public_key, private_key);
         }
         else if (choose == 3) {
+            cout << "--------------- ENCRYPT A MESSAGE ---------------" << endl;
+            string message = "";
+            do {
+                cout << "Enter your message: " << endl;
+                getline(cin, message);
+            } while (message.length() <= 0);
 
+            LargeInteger ciphertext = encryptMessage(message, public_key);
+            cout << "Your cipher text is: " << ciphertext << endl;            
         }
         else if (choose == 4) {
+            cout << "--------------- DECRYPT A MESSAGE ---------------" << endl;
+            bool isValidCipherText = false;
+            LargeInteger ciphertext;
+            do {
+                try {
+                    cout << "Enter a ciphertext: " << endl;
+                    cin >> ciphertext;
+                    isValidCipherText = true;
+                }
+                catch (const char* error) {
+                    cout << "Error: " << error << endl;
+                }
+            } while (!isValidCipherText);
 
+            string plaintext = decryptMessage(ciphertext, public_key, private_key);
+            cout << "Your plaintext is: " << plaintext << endl;
         }
         else if (choose == 5) {
-
+            setUpNewKey(p, q, private_key, public_key);
         }
+
+        cout << "Press Enter to continue..." << endl;
+        getchar();
 
     }
     while (choose != 0);

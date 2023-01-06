@@ -32,7 +32,7 @@ void encryptFile(string plain_file_path, Key_Pair public_key, string encrypted_f
 void decryptFile(string encrypted_file_path, string plain_file_path, Key_Pair public_key, LargeInteger private_key);
 
 // check Prime using Fermat theory
-bool checkPrimeFermat(LargeInteger n, int k = 5);
+bool checkPrimeFermat(LargeInteger n, int k = 12);
 
 // bruteforce check prime
 bool isPrime(LargeInteger n);
