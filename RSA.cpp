@@ -242,7 +242,6 @@ void decryptFile(string encrypted_file_path, string plain_file_path, Key_Pair pu
     fstream encrypted_file(encrypted_file_path, ios::in);
     string ciphertext;
     getline(encrypted_file, ciphertext);
-    cout << ciphertext << endl;
     encrypted_file.close();
 
     fstream plain_file(plain_file_path, ios::out);
