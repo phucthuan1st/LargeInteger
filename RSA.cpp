@@ -120,7 +120,7 @@ void generateSecrectPair(LargeInteger &p, LargeInteger &q, int size)
 Key_Pair generatePublicKey(LargeInteger &p, LargeInteger &q) {
     LargeInteger n = p * q;
 
-    LargeInteger e = pow(constant::two, n % 100);
+    LargeInteger e = pow(constant::two, n % 64);
     LargeInteger phi = (p - constant::one) * (q - constant::one);
 
     while (gcd(e, phi) != 1) {
@@ -274,6 +274,13 @@ void setUpNewKey(LargeInteger &p, LargeInteger &q, LargeInteger &private_key, Ke
     public_key = generatePublicKey(p, q);
     LargeInteger phi = (p - constant::one)*(q - constant::one);
     private_key = calculatePrivateKey(public_key.first, phi);
+
+    cout << "Your new key is: " << endl;
+    cout << "Secrect pair: " << endl;
+    cout << "              p = " << p << endl;
+    cout << "              q = " << q << endl;
+    cout << "Public key: e = " << public_key.first << ", n = " << public_key.second << endl;
+    cout << "Private key: d = " << private_key << endl;
 }
 
 void menu() {
@@ -322,7 +329,12 @@ void menu() {
                 getline(cin, plain_file_path);
             } while (plain_file_path.length() <= 0);
 
-            decryptFile(plain_file_path, encrypted_file_path, public_key, private_key);
+            try {
+                decryptFile(plain_file_path, encrypted_file_path, public_key, private_key);
+            }
+            catch (const char* error) {
+                cout << "Error when decrypt: " << error << endl;
+            }
         }
         else if (choose == 3) {
             cout << "--------------- ENCRYPT A MESSAGE ---------------" << endl;
@@ -358,6 +370,7 @@ void menu() {
         }
 
         cout << "Press Enter to continue..." << endl;
+        cin.ignore();
         getchar();
 
     }
